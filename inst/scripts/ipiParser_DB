@@ -1,0 +1,250 @@
+# This is part of the parser for IPI data 
+
+# From KEGG Gene ID to KEGG Pathway
+while(<In_PATH>){
+	chomp;
+	@array = split(/\t/,$_);
+	$array[1] =~s/path:// ;
+	if( !exists($KEGG_path{$array[0]}) ){
+		$KEGG_path{$array[0]} = $array[1] ;
+	}
+	else{
+		$KEGG_path{$array[0]} = $KEGG_path{$array[0]}.";".$array[1]  ;
+	}
+}
+close(In_PATH);
+
+# From NCBI Gene ID to KEGG Gene ID
+while(<In_KEGG>){
+	chomp;
+	@array = split(/\t/,$_) ;
+	$array[1] =~s/ncbi-geneid:// ;
+	$KEGG{$array[1]} = $array[0] ;
+}
+close(In_KEGG);
+
+
+# From NCBI Gene ID to GO
+<In_GO>;
+while(<In_GO>){
+	chomp;
+	@array = split(/\t/,$_);
+	if (  $organism == $array[0] ){
+		if($array[7] eq "Function"){
+			if( !exists($go_f{$array[1]}) ){
+				$go_f{$array[1]} = $array[2]."@".$array[3] ;
+			}
+			else{
+				$go_f{$array[1]} = $go_f{$array[1]}.";".$array[2]."@".$array[3] ;
+			}
+		}
+		elsif($array[7] eq "Component"){
+			if( !exists($go_c{$array[1]}) ){
+				$go_c{$array[1]} = $array[2]."@".$array[3]   ;
+			}
+			else{
+				$go_c{$array[1]} = $go_c{$array[1]}.";".$array[2]."@".$array[3]  ;
+			}
+		}
+		elsif($array[7] eq "Process"){
+			if( !exists($go_p{$array[1]}) ){
+				$go_p{$array[1]} = $array[2]."@".$array[3]   ;
+			}
+			else{
+				$go_p{$array[1]} = $go_p{$array[1]}.";".$array[2]."@".$array[3]  ;
+			}
+		}
+	}
+}
+close(In_GO);
+
+print OUT_basic  "ipi_id\tipi_ac\tlen\tmw\tde\tsymbol\tsp_ac\tsp_id\tref_id\tgi\tgene_id\tunigene_id\tkegg_id\n";
+print OUT_seq "ipi_id\tseq\n";
+print OUT_ipiac "ipi_id\tipi_acs\n" ;
+print OUT_go  "ipi_id\tgo_id\tevidence\tontology\n";
+print OUT_pfam  "ipi_id\tpfam_id\n";
+print OUT_interpro  "ipi_id\tinterpro_id\n";
+print OUT_path  "ipi_id\tpath_id\n";
+print OUT_prosite  "ipi_id\tprosite_id\n";
+
+#%outFile;
+&setOut;
+
+while($line=<DATA>){
+	chomp($line) ;
+	if($line=~/^ID\s+([\w\.]+)\s+.*\s(\d+)\s+AA\./){
+		$outFile{"ID"} = $1;
+		$outFile{"LEN"} = $2;
+	}
+	if($line=~/^AC\s+(.*);$/){					 
+	  if( $outFile{"ACs"} eq "" ){
+			$outFile{"ACs"}=$1;
+		}
+		else{
+			$outFile{"ACs"}=$outFile{"ACs"}.";".$1;
+		}
+	}
+	elsif($line=~/^DE\s+(.*)/){
+		if( $outFile{"DE"} eq "" ){
+			$outFile{"DE"}=$1;	
+		}else{
+			$outFile{"DE"}=$outFile{"DE"}." ".$1;		
+		}
+	}
+	elsif($line=~/^CC\s+\-!\- GENE_LOCATION:.*Chr\.\s+(\d+):(\d+)\-(\d+):([\-\d]+)/){
+		$outFile{"CHR"} = $1 ;
+		$outFile{"START"} = $2 ; 
+		$outFile{"END"} = $3 ;
+		if ($4==1){
+			$outFile{"ORIENT"} = "+" ;
+		}
+		elsif ($4==-1){
+			$outFile{"ORIENT"} = "-" ;
+		} 
+	}
+	elsif($line=~/^DR\s+REFSEQ_REVIEWED;\s+([\w\.]+);\s+GI:(\d+);/){
+		$outFile{"RefSeq"} = $1 ;
+		$outFile{"GI"} = $2 ;
+	}
+	elsif($line=~/^DR\s+UniProtKB\/Swiss-Prot;\s+([\w\-]+);\s+(\w+);/){
+		$outFile{"spAC"} =$1 ;	
+		$outFile{"spID"} =$2 ;
+		$outFile{"spAC"} =~s/\-\d+// ;				
+	}
+	elsif($line=~/^DR\s+Entrez Gene;\s+(\d+);\s+(\w+);/){				
+		$outFile{"GS"} = $2 ;
+		$outFile{"GeneID"} = $1 ;
+		if( exists($KEGG{$1}) ){
+			$outFile{"KEGG"} = $KEGG{$1} ;
+		}
+		if( exists($KEGG_path{$outFile{"KEGG"}}) ){
+			$outFile{"PATH"} = $KEGG_path{$outFile{"KEGG"}} ;
+		}
+		if( exists($go_f{$1}) ){
+			$outFile{"GOMF"} = $go_f{$1} ; 
+		}
+		if( exists($go_p{$1}) ){
+			$outFile{"GOBP"} = $go_p{$1} ;
+		}
+		if( exists($go_c{$1}) ){
+			$outFile{"GOCC"} = $go_c{$1} ;
+		}
+	}
+	elsif($line=~/^DR\s+UniGene;\s+([\w\.]+);/){
+		$outFile{"UniGene"} = $1 ;
+	}
+	elsif($line=~/^DR\s+InterPro;\s+(\w+);/){
+		print OUT_interpro $outFile{"ID"}."\t$1\n" ;
+	}	
+	elsif($line=~/^DR\s+Pfam;\s+(\w+);/){
+		print OUT_pfam $outFile{"ID"}."\t$1\n" ;
+	}
+	elsif($line=~/^DR\s+PROSITE;\s+(\w+);/){
+		print OUT_prosite $outFile{"ID"}."\t$1\n" ;
+	}
+	elsif($line=~/^SQ\s+SEQUENCE.*\s(\d+)\s+MW;/){
+		$outFile{"MW"} = $1;
+		$tag=1;
+	}
+	elsif($tag==1){
+		if( $outFile{"SQ"} eq "" ){
+			$outFile{"SQ"}=$line;
+		}else{
+			$outFile{"SQ"}=$outFile{"SQ"}.$line;
+		}
+	}
+	
+	if($line=~/^\/\//){
+		$outFile{"ACs"} =~s/\s+//g;	
+		@tmp_ACs = split(/;/,$outFile{"ACs"})	;
+		$outFile{"AC"} = $tmp_ACs[0] ;	
+      	       foreach $tmp_AC (@tmp_ACs){
+			print OUT_ipiac $outFile{"ID"}."\t$tmp_AC\n" ;
+	       }
+		$outFile{"SQ"}=~s/[\s\n\/]//g;
+		if( $outFile{"PATH"} ne "" ){
+		    @tmp_path = split(/;/,$outFile{"PATH"})	;
+		    foreach $tmp_path (@tmp_path){
+		    	print OUT_path $outFile{"ID"}."\t$tmp_path\n" ;
+		    }
+	        }
+	        if( $outFile{"GOMF"} ne "" ){
+		    @tmp_mf = split(/;/,$outFile{"GOMF"})	;
+		    foreach $tmp_mf (@tmp_mf){
+		    	$tmp_mf =~s/@/\t/ ;
+		    	print OUT_go $outFile{"ID"}."\t$tmp_mf\tMF\n" ;
+		    }
+	        }
+	        if( $outFile{"GOBP"} ne "" ){
+		    @tmp_bp = split(/;/,$outFile{"GOBP"})	;
+		    foreach $tmp_bp (@tmp_bp){
+		    	$tmp_bp =~s/@/\t/ ;
+		    	print OUT_go $outFile{"ID"}."\t$tmp_bp\tBP\n" ;
+		    }
+		}
+		if( $outFile{"GOCC"} ne "" ){
+		    @tmp_cc = split(/;/,$outFile{"GOCC"})	;
+		    foreach $tmp_cc (@tmp_cc){
+		    	$tmp_cc =~s/@/\t/ ;
+		    	print OUT_go $outFile{"ID"}."\t$tmp_cc\tCC\n" ;
+		    }
+		}
+		&writeOut ;
+    &setOut ;
+	}
+}
+close DATA;
+close OUT_basic;
+close OUT_seq;
+close OUT_ipiac;     
+close OUT_go ;
+close OUT_pfam ;
+close OUT_interpro ;
+close OUT_path ;
+close OUT_prosite ;
+
+sub writeOut {
+	print OUT_basic $outFile{"ID"}, "\t", 
+ 	$outFile{"AC"}, "\t",    	
+	$outFile{"LEN"}, "\t",  
+	$outFile{"MW"}, "\t", 
+  $outFile{"DE"}, "\t",
+  $outFile{"GS"}, "\t",
+  $outFile{"spAC"}, "\t",
+  $outFile{"spID"}, "\t",
+  $outFile{"RefSeq"}, "\t",
+  $outFile{"GI"}, "\t",
+  $outFile{"GeneID"}, "\t",
+  $outFile{"UniGene"}, "\t",
+	$outFile{"KEGG"}, "\n" ;
+	
+	print OUT_seq $outFile{"ID"}, "\t", 
+	$outFile{"SQ"}, "\n" ;
+}
+
+sub setOut{	
+	$tag=0;	
+	$outFile{"ID"} = "";
+	$outFile{"AC"} = "";	
+	$outFile{"ACs"} = "";
+	$outFile{"LEN"} = "";
+	$outFile{"MW"} = "";
+	$outFile{"DE"} = "";
+	$outFile{"CHR"} = "";
+	$outFile{"START"} = "";
+	$outFile{"END"} = "";
+	$outFile{"ORIENT"} = ""; 
+	$outFile{"GS"} = "";
+	$outFile{"spAC"} = "";
+	$outFile{"spID"} = "";
+  $outFile{"RefSeq"} = "";
+  $outFile{"GI"} = "";
+  $outFile{"GeneID"} = "";
+  $outFile{"UniGene"} = "";
+	$outFile{"GOMF"} = "";
+	$outFile{"GOBP"} = "";
+	$outFile{"GOCC"} = "";
+	$outFile{"KEGG"} = "";
+	$outFile{"PATH"} = "";
+	$outFile{"SQ"} = "";	
+}

@@ -1,0 +1,183 @@
+# This is part of the parser for NCBI RefSeq data 
+while(<DATA>){
+	chomp;	
+	if(/^>gi\|(\d+)\|ref\|([\w\_\.]+)\|/){
+		$locus = $2;
+		$seq{$locus} = "" ;		
+	  $GI{$locus} = $1 ;
+	}
+	else{
+		$seq{$locus} = $seq{$locus}.$_ ;
+	}
+}
+close DATA;
+
+<In_Gene2refseq> ;
+while(<In_Gene2refseq>){
+	chomp;
+	@array = split(/\t/,$_) ;
+	if( exists($seq{$array[5]}) ){
+		$gi2gene{$array[5]} = $array[1] ; 
+		$gene2gi{$array[1]} = $array[5] ;
+		if( $array[12]=~/Reference assembly/ and $array[7]=~/NC_/ ){			
+			$START{$array[1]} = $array[9] ;  
+			$END{$array[1]} = $array[10] ;    
+			$ORIENT{$array[1]} = $array[11] ; 
+		}
+	}
+}
+close(In_Gene2refseq);
+
+<In_GeneInfo> ;
+while(<In_GeneInfo>){
+	chomp;
+	@array = split(/\t/,$_) ;
+	if( exists($gene2gi{$array[1]}) ){
+		$GN{$array[1]} = $array[2] ;
+		$array[4] =~s/\|/@/g ;
+		$GS{$array[1]} = $array[4] ;		
+		$DE{$array[1]} = $array[8] ;
+		$CHR{$array[1]} = $array[6];
+	}
+}
+close(In_GeneInfo);
+
+# From KEGG Gene ID to KEGG Pathway
+while(<In_PATH>){
+	chomp;
+	@array = split(/\t/,$_);
+	$array[1] =~s/path:// ;
+	if( !exists($KEGG_path{$array[0]}) ){
+		$KEGG_path{$array[0]} = $array[1] ;
+	}
+	else{
+		$KEGG_path{$array[0]} = $KEGG_path{$array[0]}.";".$array[1]  ;
+	}
+}
+close(In_PATH);
+
+# From NCBI GI to KEGG Gene ID
+while(<In_KEGG>){
+	chomp;
+	@array = split(/\t/,$_) ;
+	$array[1] =~s/ncbi-gi:// ;
+	if( exists($KEGG_path{$array[0]}) ){		
+		$PATH{$array[1]} = $KEGG_path{$array[0]} ;
+	}
+	$KEGG{$array[1]} = $array[0] ;
+	
+}
+close(In_KEGG);
+
+# From NCBI Gene ID to GO
+<In_GO>;
+while(<In_GO>){
+	chomp;
+	@array = split(/\t/,$_);
+	if( exists($gene2gi{$array[1]}) ){
+		if($array[7] eq "Function"){
+			if( !exists($go_f{$array[1]}) ){
+				$go_f{$array[1]} = $array[2]."@".$array[3]  ;
+			}
+			else{
+				$go_f{$array[1]} = $go_f{$array[1]}.";".$array[2]."@".$array[3]  ;
+			}
+		}
+		elsif($array[7] eq "Component"){
+			if( !exists($go_c{$array[1]}) ){
+				$go_c{$array[1]} = $array[2]."@".$array[3]   ;
+			}
+			else{
+				$go_c{$array[1]} = $go_c{$array[1]}.";".$array[2]."@".$array[3]  ;
+			}
+		}
+		elsif($array[7] eq "Process"){
+			if( !exists($go_p{$array[1]}) ){
+				$go_p{$array[1]} = $array[2]."@".$array[3]   ;
+			}
+			else{
+				$go_p{$array[1]} = $go_p{$array[1]}.";".$array[2]."@".$array[3]  ;
+			}
+		}
+	}
+}
+close(In_GO);
+
+print OUT_basic "gi\tref_id\tgene_id\tsymbol\tde\tkegg_id\n" ;  
+print OUT_seq "gi\tseq\n";
+print OUT_go  "gi\tgo_id\tevidence\tontology\n";
+print OUT_path  "gi\tpath_id\n";
+
+@locus = sort(keys(%seq)) ; 
+foreach $locus(@locus){	
+	if( !exists($gi2gene{$locus}) ){
+		$GeneID = "" ;
+	}
+	else{
+		$GeneID = $gi2gene{$locus} ;
+	}
+	if( !exists($RefSeq{$GeneID}) ){
+		$RefSeq{$GeneID} = "" ;	
+	}
+	if( !exists($CHR{$GeneID}) ){
+		$CHR{$GeneID} = "" ;
+	}
+	if( !exists($START{$GeneID}) ){
+		$START{$GeneID} = "";
+	}
+	if( !exists($END{$GeneID}) ){
+		$END{$GeneID} = "";
+	}
+	if( !exists($ORIENT{$GeneID}) ){
+		$ORIENT{$GeneID} = ""; 
+	}
+	if( !exists($GN{$GeneID}) ){
+		$GN{$GeneID} = "" ;
+	}
+	if( exists($GS{$GeneID}) ){
+		@tmp_gs = split(/@/,$GS{$GeneID}) ;
+		foreach $tmp_gs (@tmp_gs){
+		  	print OUT_gs $GI{$locus}."\t$tmp_gs\n" ;
+		}
+	}
+	if( !exists($DE{$GeneID}) ){
+		$DE{$GeneID} = "" ;
+	}
+	if( !exists($KEGG{$GI{$locus}}) ){
+	        $KEGG{$GI{$locus}} = "" ;	
+	}
+	if( exists($PATH{$GI{$locus}}) ){
+	       @tmp_path = split(/;/,$PATH{$GI{$locus}}) ;
+		foreach $tmp_path (@tmp_path){
+		  	print OUT_path $GI{$locus}."\t$tmp_path\n" ;
+		}
+	}
+	if( exists($go_f{$GeneID}) ){		
+		@tmp_mf = split(/;/,$go_f{$GeneID} )	;
+		foreach $tmp_mf (@tmp_mf){
+		    $tmp_mf =~s/@/\t/ ;
+		    print OUT_go $GI{$locus}."\t$tmp_mf\tMF\n" ;
+		}
+	}
+	if( exists($go_c{$GeneID}) ){
+		@tmp_cc = split(/;/,$go_c{$GeneID} )	;
+		foreach $tmp_cc (@tmp_cc){
+		    $tmp_cc =~s/@/\t/ ;
+		    print OUT_go $GI{$locus}."\t$tmp_cc\tCC\n" ;
+		}
+	}
+	if( exists($go_p{$GeneID}) ){
+		@tmp_bp = split(/;/,$go_p{$GeneID} )	;
+		foreach $tmp_bp (@tmp_bp){
+		    $tmp_bp =~s/@/\t/ ;
+		    print OUT_go $GI{$locus}."\t$tmp_bp\tBP\n" ;
+		}
+	}
+	print OUT_basic "$GI{$locus}\t$locus\t$GeneID\t$GN{$GeneID}\t$DE{$GeneID}\t$KEGG{$GI{$locus}}\n" ;		
+	print OUT_seq "$GI{$locus}\t$seq{$locus}\n" ;		
+}
+close OUT_basic;
+close OUT_seq;
+close OUT_go;
+close OUT_path;
+

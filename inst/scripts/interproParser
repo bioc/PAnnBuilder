@@ -1,0 +1,59 @@
+# This is part of the parser to get proteins of given organism
+
+while($line=<IN1>){
+	chomp($line);
+	if($line=~/^AC\s+(.*);$/){
+		if( $ACs eq "" ){
+			$ACs=$1;
+		}
+		else{
+			$ACs=$ACs.";".$1;
+		}
+	}
+	elsif( $line=~/^OS\s+([\w\s]+)\s*\W/ ){
+		$OS = $1 ;
+		$OS =~s/\s+$// ;
+	}
+	if(($line=~/^\/\//) and ($OS eq $organism) ){		
+		@tmp_ACs = split(/;/,$ACs)	;
+		foreach $tmp(@tmp_ACs){
+			$hash{$tmp} = 1 ;
+		}
+	}
+}
+
+while($line=<IN2>){
+	chomp($line);
+	if($line=~/^AC\s+(.*);$/){
+		if( $ACs eq "" ){
+			$ACs=$1;
+		}
+		else{
+			$ACs=$ACs.";".$1;
+		}
+	}
+	elsif( $line=~/^OS\s+([\w\s]+)\s*\W/ ){
+		$OS = $1 ;
+		$OS =~s/\s+$// ;
+	}
+	if(($line=~/^\/\//) & ($OS eq $organism) ){		
+		@tmp_ACs = split(/;/,$ACs)	;
+		foreach $tmp(@tmp_ACs){
+			$hash{$tmp} = 1 ;
+		}
+	}
+}
+
+while($line=<DATA>){
+	@array = split(/\t/,$line) ;
+	if( $hash{$array[0]}==1 ){
+		print OUT $line;
+	}
+}
+
+close IN1 ;
+close IN2 ;
+close DATA;
+close OUT;
+
+

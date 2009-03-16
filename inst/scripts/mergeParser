@@ -1,0 +1,80 @@
+# This is part of the parser for merge different ID mapping files
+
+$n = 0 ;
+foreach $file (@files){
+	open(In,$file) or die;
+	$line = <In> ;
+	chomp($line);
+	@name = split(/\t/,$line);
+	$name{$name[0]} = 1 ;
+	$name{$name[1]} = 1 ;
+	
+	while(<In>){
+		chomp;
+		@array = split(/\t/,$_);
+		$tag = 0 ;
+		
+		@tmp = split(/\t/,$array[0]);
+		foreach $tmp(@tmp){
+			if( exists($hash{$name[0]." : ".$tmp}) ){
+				$tmpKey = $hash{$name[0]." : ".$tmp}." : ".$name[0] ;
+				$hash{$tmpKey} = $hash{$tmpKey}.";".$array[0] ;
+				print $tmpKey."\t".$hash{$tmpKey}."\n" ;
+				$tmpKey = $hash{$name[0]." : ".$tmp}." : ".$name[1] ;
+				$hash{$tmpKey} = $hash{$tmpKey}.";".$array[1] ;
+				print $tmpKey."\t".$hash{$tmpKey}."\n" ;
+				$tag = 1 ;
+				
+			}			
+		}
+		
+		@tmp = split(/\t/,$array[1]);
+		foreach $tmp(@tmp){
+			if( exists($hash{$name[1]." : ".$tmp}) ){
+				$tmpKey = $hash{$name[1]." : ".$tmp}." : ".$name[0] ;
+				$hash{$tmpKey} = $hash{$tmpKey}.";".$array[0] ;
+				print $tmpKey."\t".$hash{$tmpKey}."\n" ;
+				$tmpKey = $hash{$name[1]." : ".$tmp}." : ".$name[1] ;
+				$hash{$tmpKey} = $hash{$tmpKey}.";".$array[1] ;
+				print $tmpKey."\t".$hash{$tmpKey}."\n" ;
+				$tag = 1 ;
+			}			
+		}
+		
+		if($tag==0){
+			$n = $n + 1 ;
+			$hash{$n." : ".$name[0]} = $array[0] ;
+			$hash{$n." : ".$name[1]} = $array[1] ;
+			@tmp = split(/\t/,$array[0]);
+			foreach $tmp(@tmp){
+				$hash{$name[0]." : ".$tmp} = $n ;
+			}
+			@tmp = split(/\t/,$array[1]);
+			foreach $tmp(@tmp){
+				$hash{$name[1]." : ".$tmp} = $n ;
+			}
+		}		
+	}
+	close(In);
+}
+
+@name = sort(keys(%name));
+print Out "newKey" ;
+foreach $name( @name ){	
+	print Out "\t$name" ;
+}
+print Out "\n" ;
+for($i=1;$i<=$n;$i++){
+	print Out "$i" ;
+	foreach $name( @name ){
+		$tmp = $hash{$i." : ".$name} ;	
+		$tmp =~s/^;// ;
+		@array = split(/;/,$tmp) ;
+		%tmphash = map { $_ => 1 } @array;
+		$tmp = join(";",sort(keys(%tmphash)) );
+		print Out "\t$tmp" ;
+	}
+	print Out "\n" ;
+}
+close(Out);
+

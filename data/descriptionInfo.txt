@@ -1,0 +1,10 @@
+biocPkgName	organism	species	dataSource	biocViews
+hsasp	Homo sapiens	Human	UniProtKB/Swiss-Prot (http://expasy.org/sprot)	AnnotationData
+hsaipi	Homo sapiens	Human	International Protein Index (http://www.ebi.ac.uk/IPI)	AnnotationData
+hsaref	Homo sapiens	Human	NCBI Reference Sequence (http://www.ncbi.nlm.nih.gov/RefSeq)	AnnotationData
+mmusp	Mus musculus	Mouse	UniProtKB/Swiss-Prot (http://expasy.org/sprot)	AnnotationData
+mmuipi	Mus musculus	Mouse	International Protein Index (http://www.ebi.ac.uk/IPI)	AnnotationData
+mmuref	Mus musculus	Mouse	NCBI Reference Sequence (http://www.ncbi.nlm.nih.gov/RefSeq)	AnnotationData
+rnosp	Rattus norvegicus	Rat	UniProtKB/Swiss-Prot (http://expasy.org/sprot)	AnnotationData
+rnoipi	Rattus norvegicus	Rat	International Protein Index (http://www.ebi.ac.uk/IPI)	AnnotationData
+rnoref	Rattus norvegicus	Rat	NCBI Reference Sequence (http://www.ncbi.nlm.nih.gov/RefSeq)	AnnotationData

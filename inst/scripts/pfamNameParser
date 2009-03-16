@@ -1,0 +1,20 @@
+# This is part of the parser for Pfam domain id and name
+
+print OUT "PFAM\tNAME\tDE\n" ;
+while($line=<DATA>){
+	chomp($line);
+	if( $line=~/^NAME\s+(.*)/ ){
+		$name=$1;
+		$line=<DATA>;
+		if( $line=~/^ACC\s+(.*)/ ){
+			print OUT "$1\t$name\t" ;
+		}
+		$line=<DATA>;
+		if( $line=~/^DESC\s+(.*)/ ){
+			print OUT "$1" ;
+		}
+		print OUT "\n"
+	}
+}
+close(DATA);
+close(OUT);

@@ -1,0 +1,10 @@
+import(methods)
+import(AnnotationDbi)
+import(PAnnBuilder)
+
+export(
+    #PREFIX#_dbconn,
+    #PREFIX#_dbfile,
+    #PREFIX#_dbInfo
+)
+

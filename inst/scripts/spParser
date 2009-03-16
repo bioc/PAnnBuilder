@@ -1,0 +1,361 @@
+# This is part of the parser for Swiss-Prot data 
+
+# From KEGG Gene ID to KEGG Pathway
+while(<In_PATH>){
+	chomp;
+	@array = split(/\t/,$_);
+	$array[1] =~s/path:// ;
+	if( !exists($KEGG_path{$array[0]}) ){
+		$KEGG_path{$array[0]} = $array[1] ;
+	}
+	else{
+		$KEGG_path{$array[0]} = $KEGG_path{$array[0]}.";".$array[1]  ;
+	}
+}
+close(In_PATH);
+
+print OUT  "SPID", "\t", "SPAC", "\t", "SPACs", "\t", "LEN", "\t", "MW", "\t", "DE", "\t", "EC", "\t",
+"GN", "\t", "SYMBOL", "\t", "PMID", "\t", "REFSEQ", "\t", "GENEID", "\t", "UNIGENE", "\t", "OMIM", "\t",
+"GO", "\t", "KEGG", "\t", "PATH", "\t", "INTERPRO", "\t", "PFAM", "\t", "PROSITE", "\t", 
+"PDB", "\t", "FUNCTION", "\t", "INTERACTION", "\t", "SUBCELL", "\t", "TISSUE", "\t", 
+"DISEASE", "\t", "PTM", "\t", "SQ", "\n";
+
+#%outFile;
+&setOut;
+
+while($line=<DATA>){
+	chomp($line);
+	if($line=~/^ID\s+(\w+)\s+.*\s(\d+)\s+AA\./){
+		$outFile{"ID"} = $1;
+		$outFile{"LEN"} = $2;
+	}
+	elsif($line=~/^AC\s+(.*);$/){
+		if( $outFile{"ACs"} eq "NA" ){
+			$outFile{"ACs"}=$1;
+		}
+		else{
+			$outFile{"ACs"}=$outFile{"ACs"}.";".$1;
+		}
+	}
+	elsif($line=~/^DE\s+(.*)/){  
+		if( $outFile{"DE"} eq "NA" ){
+			$outFile{"DE"}=$1;	
+		}else{
+			$outFile{"DE"}=$outFile{"DE"}." ".$1;		
+		}
+	}
+	elsif($line=~/^GN\s+(\S.*)/){
+		$temp_gene=$temp_gene.$1;
+		if( $line=~/^GN.*\sName=(\S+);/  ){
+			$outFile{"GS"} = lc($1) ;
+		}
+	}
+	elsif( $line=~/^OS\s+([\w\s]+)\s*\W/ ){
+		$outFile{"OS"} = $1 ;
+		$outFile{"OS"}=~s/\s+$// ;
+	}
+	elsif( $line=~/^RX.*\sPubMed=(\d+);/ ){
+    		if($outFile{"PMID"} eq "NA"){
+			$outFile{"PMID"} = $1;
+	 	 }else{
+			$outFile{"PMID"} = $outFile{"PMID"}.";".$1;  
+    		}	  
+	}
+	elsif( $line=~/^DR\s+RefSeq;\s+([\w_\.]+);/ ){
+    		if($outFile{"REFSEQ"} eq "NA"){
+			$outFile{"REFSEQ"} = $1;
+	  	}else{
+			$outFile{"REFSEQ"} = $outFile{"REFSEQ"}.";".$1;  
+    		}	  
+	}
+	elsif( $line=~/^DR\s+GeneID;\s+(\d+);/ ){
+		if($outFile{"GeneID"} eq "NA"){
+			$outFile{"GeneID"} = $1;
+		}else{
+			$outFile{"GeneID"} = $outFile{"GeneID"}.";".$1;  
+    		}	  
+	}
+	elsif( $line=~/^DR\s+UniGene;\s+([\w\.\d]+);/ ){
+		$outFile{"UniGene"} = $1;	  
+	}
+	elsif($line=~/^DR\s+MIM;\s+(\d+);\s+phenotype\./){
+		if($outFile{"MIM"} eq "NA"){
+			$outFile{"MIM"} = $1 ;
+		}
+		else{
+			$outFile{"MIM"} = $outFile{"MIM"}.";".$1 ;
+		}
+	}	
+	elsif($line=~/^DR\s+GO;\s+(GO:\d+);\s+(\w):(.*);\s+(\w+):/){
+		if($2 eq "C"){
+			if($outFile{"GO"} eq "NA"){
+				$outFile{"GO"} = $1."@".$4."@"."CC";
+			}
+			else{
+				$outFile{"GO"} = $outFile{"GO"}.";".$1."@".$4."@"."CC" ;
+			}
+		}
+		elsif($2 eq "P"  ){
+			if($outFile{"GO"} eq "NA"){
+				$outFile{"GO"} = $1."@".$4."@"."BP";
+			}
+			else{
+				$outFile{"GO"} = $outFile{"GO"}.";".$1."@".$4."@"."BP" ;
+			}
+		}
+		elsif($2 eq "F"  ){
+			if($outFile{"GO"} eq "NA"){
+				$outFile{"GO"} = $1."@".$4."@"."MF" ;
+			}
+			else{
+				$outFile{"GO"} = $outFile{"GO"}.";".$1."@".$4."@"."MF" ;
+			}
+		}
+	}
+	elsif($line=~/^DR\s+KEGG;\s+([\w:]+);/){
+		if($outFile{"KEGG"} eq "NA"){
+			$outFile{"KEGG"} = $1;
+		}
+		else{
+			$outFile{"KEGG"} = $outFile{"KEGG"}.";".$1;
+			
+		}
+		if( exists($KEGG_path{$1}) ){
+			if( $outFile{"PATH"} eq "NA" ){
+				$outFile{"PATH"} = $KEGG_path{$1} ;
+			}
+			else{
+				$outFile{"PATH"} = $outFile{"PATH"}.";".$KEGG_path{$1} ;
+			}
+		}
+	}
+	elsif($line=~/^DR\s+InterPro;\s+(\w+);/){
+		if($outFile{"INTERPRO"} eq "NA"){
+			$outFile{"INTERPRO"} = $1;
+		}
+		else{
+			$outFile{"INTERPRO"} = $outFile{"INTERPRO"}.";".$1 ;
+		}
+	}	
+	elsif($line=~/^DR\s+Pfam;\s+(\w+);/){
+		if($outFile{"PFAM"} eq "NA"){
+			$outFile{"PFAM"} = $1;
+		}
+		else{
+			$outFile{"PFAM"} = $outFile{"PFAM"}.";".$1 ;
+		}
+	}
+	elsif($line=~/^DR\s+PROSITE;\s+(\w+);/){
+		if($outFile{"PROSITE"} eq "NA"){
+			$outFile{"PROSITE"} = $1;
+		}
+		else{
+			$outFile{"PROSITE"} = $outFile{"PROSITE"}.";".$1 ;
+		}
+	}	
+	elsif($line=~/^DR\s+PDB;\s+(\w+);/){
+		if($outFile{"PDB"} eq "NA"){
+			$outFile{"PDB"} = $1;
+		}
+		else{
+			$outFile{"PDB"} = $outFile{"PDB"}.";".$1;
+		}
+	}
+	elsif($line=~/^CC\s+\-\-\-\-\-/){
+		$CC_tag=1;
+	}
+	elsif($line=~/^CC(.*)/ and $CC_tag==0){
+		$CC=$CC.$1;
+	}
+	elsif($line=~/^FT\s+/){
+		$name=substr($line,5,8);
+		$name=~s/\s+//g;
+		if($name ne ""){
+			$i++ ;
+			$name[$i]=$name;
+			$start[$i]=substr($line,14,6);
+			$end[$i]=substr($line,21,6);
+			$start[$i]=~s/\s+//g;
+			$end[$i]=~s/\s+//g;
+			if( length($line)<34 ){
+				$name_des[$i]="";
+			}
+			elsif( length($line)>=75 ){
+				$name_des[$i]=substr($line,34,75);
+			}
+			else{
+				$name_des[$i]=substr($line,34,length($line));
+			}
+		}
+		else{
+			$name_des[$i]=$name_des[$i].substr($line,34,75);
+		}
+		$name_des[$i]=~s/\s+/ /g;
+		$name_des[$i]=~s/;/,/g;
+	}
+	elsif($line=~/^SQ\s+SEQUENCE.*\s(\d+)\s+MW;/){
+		$outFile{"MW"} = $1;
+		$tag=1;
+	}
+	elsif($tag==1){
+		if( $outFile{"SQ"} eq "NA" ){
+			$outFile{"SQ"}=$line;
+		}else{
+			$outFile{"SQ"}=$outFile{"SQ"}.$line;
+		}
+	}
+	
+	if($line=~/^\/\//){
+		$outFile{"ACs"} =~s/\s+//g;	
+		@tmp_ACs = split(/;/,$outFile{"ACs"})	;
+		$outFile{"AC"} = $tmp_ACs[0] ;				
+		$outFile{"DE"} =~s/\s+/ /g;
+		while( $outFile{"DE"} =~/EC (\d+\.\d+\.\d+\.\d+)/g ){
+			if( $outFile{"EC"} eq "NA"){
+				$outFile{"EC"} = $1 ;
+			}else{
+				$outFile{"EC"} = $outFile{"EC"}.";".$1 ;
+			}
+		}
+		@temp_gene=split(/;/,$temp_gene);
+		for($g=0;$g<@temp_gene;$g++){
+			if($temp_gene[$g]=~/\w+\=(.+)/){
+				if($outFile{"GN"} eq "NA"){
+					$outFile{"GN"} = $1;
+				}
+				else{
+					$outFile{"GN"} = $outFile{"GN"}.";".$1;
+				}
+			}
+		}
+		@CC=split(/\-!\- /,$CC);
+		foreach $temp_CC (@CC) {
+			if($temp_CC=~/^FUNCTION:\s+(.*)/){
+				$outFile{"FUNCTION"} = $1;
+				$outFile{"FUNCTION"} =~s/\s+/ /g;
+			}
+			elsif($temp_CC=~/^INTERACTION:(.*)/){
+				 @temp_inter = split(/;/,$1);
+				 foreach $temp_inter(@temp_inter){
+					 if($temp_inter=~/^\s+(\w+):/){
+					 	if( $outFile{"INTERACTION"} eq "NA" ){
+					 		$outFile{"INTERACTION"} = $1;
+					 	}else{
+						$outFile{"INTERACTION"} = $outFile{"INTERACTION"}.";".$1;
+						}
+					 }
+				 }
+			}
+			elsif($temp_CC=~/^SUBCELLULAR LOCATION:\s+(.*)/){
+				$outFile{"SUBCELLULAR"} = $1;
+				$outFile{"SUBCELLULAR"} =~s/\s+/ /g;
+			}
+			elsif($temp_CC=~/^TISSUE SPECIFICITY:\s+(.*)/){
+				$outFile{"TISSUE"} = $1;
+				$outFile{"TISSUE"} =~s/\s+/ /g;
+			}
+			elsif($temp_CC=~/^DISEASE:\s+(.*)/){
+				$outFile{"DISEASE"} = $1;
+				$outFile{"DISEASE"} =~s/\s+/ /g;
+			}
+		}
+    		for($k=0;$k<=$i;$k++){
+			if(($name[$k] eq "MOD_RES") or $name[$k] eq "LIPID" or $name[$k] eq "CARBOHYD" or $name[$k] eq "DISULFID" or $name[$k] eq "CROSSLNK" ){
+					if( $outFile{"PTM"} eq "NA" ){
+						$outFile{"PTM"} = "$name[$k]\@$start[$k]\@$end[$k]\@$name_des[$k]";
+					}
+					else{
+						$outFile{"PTM"} = $outFile{"PTM"}.";"."$name[$k]\@$start[$k]\@$end[$k]\@$name_des[$k]";						
+					}
+					if($name_des[$k]=~/By similarity/){
+						$outFile{"PTM"} = $outFile{"PTM"}."\@By similarity" ;						
+					} 
+          elsif($name_des[$k]=~/Potential/){
+            $outFile{"PTM"} = $outFile{"PTM"}."\@Potential" ;	            
+          }
+          elsif($name_des[$k]=~/Probable/){						
+            $outFile{"PTM"} = $outFile{"PTM"}."\@Probable" ;
+          }
+					else{
+					  $outFile{"PTM"} = $outFile{"PTM"}."\@Experimental" ;						
+					}
+			}
+		}
+	$outFile{"SQ"}=~s/[\s\n\/]//g;
+    	&writeOut ;
+    	&setOut ;
+  }
+}
+
+close DATA;
+close OUT;
+
+sub writeOut {
+	if( $outFile{"OS"} eq $organism ){
+  print OUT $outFile{"ID"}, "\t", 
+  $outFile{"AC"}, "\t",   
+  $outFile{"ACs"}, "\t",
+	$outFile{"LEN"}, "\t",  
+	$outFile{"MW"}, "\t", 
+  $outFile{"DE"}, "\t",
+  $outFile{"EC"}, "\t",
+  $outFile{"GN"}, "\t",
+  $outFile{"GS"}, "\t",
+  $outFile{"PMID"}, "\t",
+  $outFile{"REFSEQ"}, "\t",
+  $outFile{"GeneID"}, "\t",
+  $outFile{"UniGene"}, "\t",
+  $outFile{"MIM"}, "\t",
+  $outFile{"GO"}, "\t",
+	$outFile{"KEGG"}, "\t",
+	$outFile{"PATH"}, "\t",
+	$outFile{"INTERPRO"}, "\t",
+	$outFile{"PFAM"}, "\t",
+	$outFile{"PROSITE"}, "\t",
+	$outFile{"PDB"}, "\t",
+	$outFile{"FUNCTION"}, "\t",
+	$outFile{"INTERACTION"}, "\t",
+	$outFile{"SUBCELLULAR"}, "\t",
+	$outFile{"TISSUE"}, "\t",
+	$outFile{"DISEASE"}, "\t",
+	$outFile{"PTM"}, "\t",
+	$outFile{"SQ"}, "\n" ;
+	}
+}
+
+sub setOut{
+	$temp_gene = "" ;
+  $CC = "" ;
+  $CC_tag = 0 ;
+  $i = -1;
+  $tag=0;	
+  $outFile{"OS"} = "NA";
+	$outFile{"ID"} = "NA";
+	$outFile{"AC"} = "NA";
+	$outFile{"ACs"} = "NA";
+	$outFile{"LEN"} = "NA";
+	$outFile{"MW"} = "NA";
+	$outFile{"DE"} = "NA";
+	$outFile{"EC"} = "NA";
+	$outFile{"GN"} = "NA";
+	$outFile{"GS"} = "NA";
+	$outFile{"PMID"} = "NA";
+	$outFile{"REFSEQ"} = "NA";
+ 	$outFile{"GeneID"} = "NA";
+	$outFile{"UniGene"} = "NA";
+	$outFile{"MIM"} = "NA";
+	$outFile{"GO"} = "NA";
+	$outFile{"KEGG"} = "NA";
+	$outFile{"PATH"} = "NA";
+	$outFile{"INTERPRO"} = "NA";
+	$outFile{"PFAM"} = "NA";
+	$outFile{"PROSITE"} = "NA";
+	$outFile{"PDB"} = "NA";
+	$outFile{"FUNCTION"} = "NA";
+	$outFile{"INTERACTION"} = "NA";
+	$outFile{"SUBCELLULAR"} = "NA";
+	$outFile{"TISSUE"} = "NA";
+	$outFile{"DISEASE"} = "NA";
+	$outFile{"PTM"} = "NA";
+	$outFile{"SQ"} = "NA";	
+}

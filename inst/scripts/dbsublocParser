@@ -1,0 +1,52 @@
+# This is part of the parser for DBSubLoc data 
+
+print OUT  "SPAC\tSPECIES\tDE\tSUBCELLULAR\tSQ\n" ;
+&setOut;
+
+while($line=<DATA>){
+	chomp($line);
+	if($line=~/^DE\s+(.*)/){
+		$outFile{"DE"} = $1 ;
+	}
+	elsif($line=~/^OS\s+(.*)\./){
+		$outFile{"ORGANISM"} = $1 ;
+	}
+	elsif($line=~/^LC\s+(.*)/){
+		$outFile{"LC"} = $1 ;
+		$outFile{"LC"} =~s/\t/;/g ;
+	}
+	elsif($line=~/^CX\s+SWISS-PROT:([\w\d]+)/){
+		$outFile{"ID"} = $1 ;
+	}
+	elsif($line=~/^SQ\s+(.*)/){
+		if( $outFile{"SQ"} eq "NA" ){
+			$outFile{"SQ"}=$1;
+		}else{
+			$outFile{"SQ"}=$outFile{"SQ"}.$1;
+		}
+	}
+	
+	if($line=~/^\/\//){
+		$outFile{"SQ"}=~s/[\s\n\/]//g;
+    		&writeOut ;
+    		&setOut ;
+	}
+}
+close DATA;
+close OUT;
+
+sub writeOut {
+ 	print OUT $outFile{"ID"}, "\t", 
+	$outFile{"ORGANISM"}, "\t",
+	$outFile{"DE"}, "\t",
+  	$outFile{"LC"}, "\t",
+	$outFile{"SQ"}, "\n" ;
+}
+
+sub setOut{
+	$outFile{"ID"} = "NA";	
+	$outFile{"ORGANISM"} = "NA";	
+	$outFile{"DE"} = "NA";	
+	$outFile{"LC"} = "NA";	
+	$outFile{"SQ"} = "NA";	
+}

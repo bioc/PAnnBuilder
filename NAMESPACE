@@ -1,0 +1,17 @@
+import(methods)
+import(utils)
+import(Biobase)
+import(DBI)
+import(RSQLite)
+importFrom("AnnotationDbi", "dbschema")
+
+export(getALLUrl, getALLBuilt, idBlast,
+       createAnnObjs, 
+       pBaseBuilder_DB, pSeqBuilder_DB, crossBuilder_DB, scopBuilder_DB, 
+       subcellBuilder_DB, intBuilder_DB, InParanoidBuilder_DB, 
+       HomoloGeneBuilder_DB, PeptideAtlasBuilder_DB, dNameBuilder_DB, 
+       bfBuilder_DB, ptmBuilder_DB, GOABuilder_DB)
+      
+exportMethods(
+  "dbschema"
+)       

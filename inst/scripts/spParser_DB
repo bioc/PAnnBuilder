@@ -1,0 +1,297 @@
+# This is part of the parser for Swiss-Prot data 
+
+# From KEGG Gene ID to KEGG Pathway
+while(<In_PATH>){
+	chomp;
+	@array = split(/\t/,$_);
+	$array[1] =~s/path:// ;
+	if( !exists($KEGG_path{$array[0]}) ){
+		$KEGG_path{$array[0]} = $array[1] ;
+	}
+	else{
+		$KEGG_path{$array[0]} = $KEGG_path{$array[0]}.";".$array[1]  ;
+	}
+}
+close(In_PATH);
+
+print OUT_basic "sp_id\tsp_ac\tlen\tmw\tsymbol\tunigene_id\tfunctions\tsubcelluar\ttissue\tdisease\n";
+print OUT_seq "sp_id\tseq\n";
+print OUT_de "sp_id\tde\n" ;
+print OUT_spac "sp_id\tsp_acs\n" ;
+print OUT_pubmed "sp_id\tpubmed_id\n";
+print OUT_refseq "sp_id\tref_id\n" ;
+print OUT_geneid "sp_id\tgene_id\n" ;
+print OUT_go  "sp_id\tgo_id\tevidence\tontology\n";
+print OUT_pfam "sp_id\tpfam_id\n" ;
+print OUT_interpro "sp_id\tinterpro_id\n" ;
+print OUT_kegg "sp_id\tkegg_id\n" ;
+print OUT_path "sp_id\tpath_id\n" ;
+print OUT_prosite "sp_id\tprosite_id\n" ;
+print OUT_pdb "sp_id\tpdb_id\n" ;
+print OUT_alias "sp_id\talias_symbol\n" ;
+print OUT_int "sp_id\tsp_ac_b\n" ;
+print OUT_ptm "sp_id\tptm_mod\tptm_start\tptm_end\tptm_de\tptm_evidence\n" ;
+
+#%outFile;
+&setOut;
+while($line=<DATA>){
+	chomp($line);
+	if($line=~/^ID\s+(\w+)\s+.*\s(\d+)\s+AA\./){
+		$outFile{"ID"} = $1;
+		$outFile{"LEN"} = $2;
+	}
+	elsif($line=~/^AC\s+(.*);$/){ 
+	  if( $outFile{"ACs"} eq "" ){
+			$outFile{"ACs"}=$1;
+		}
+		else{
+			$outFile{"ACs"}=$outFile{"ACs"}.";".$1;
+		}
+	}
+	elsif($line=~/^DE\s+(.*)/){  
+		print OUT_de $outFile{"ID"}."\t$1\n" ;
+	}
+	elsif($line=~/^GN\s+(\S.*)/){
+		$temp_gene=$temp_gene.$1;
+		if( $line=~/^GN.*\sName=(\S+);/  ){
+			$outFile{"GS"} = lc($1) ;
+		}
+	}
+	elsif( $line=~/^OS\s+([\w\s]+)\s*\W/){
+		$outFile{"OS"} = $1 ;
+		$outFile{"OS"}=~s/\s+$// ;
+		if( $outFile{"OS"} eq $organism ){
+                    $output = 1;
+                }
+	}
+	elsif( $line=~/^RX.*\sPubMed=(\d+);/ ){    		
+	   if($output==1){
+               print OUT_pubmed $outFile{"ID"}."\t$1\n" ;
+           }
+	}
+	elsif( $line=~/^DR\s+RefSeq;\s+([\w_\.]+);/ ){
+            if($output==1){
+               print OUT_refseq $outFile{"ID"}."\t$1\n" ;
+            }
+	}
+	elsif( $line=~/^DR\s+GeneID;\s+(\d+);/ ){
+           if($output==1){
+               print OUT_geneid $outFile{"ID"}."\t$1\n" ;		
+           }
+	}
+	elsif( $line=~/^DR\s+UniGene;\s+([\w\.\d]+);/ ){
+		$outFile{"UniGene"} = $1;	  
+	}
+	elsif($line=~/^DR\s+MIM;\s+(\d+);\s+phenotype\./){		
+           if($output==1){
+           #    print OUT_omim $outFile{"ID"}."\t$1\n" ;		
+           }    
+	}	
+	elsif($line=~/^DR\s+GO;\s+(GO:\d+);\s+(\w):(.*);\s+(\w+):/){
+	   if($output==1){               
+		if($2 eq "C"){
+			print OUT_go $outFile{"ID"}."\t$1\t$4\tCC\n" ;
+		}
+		elsif($2 eq "P"  ){
+			print OUT_go $outFile{"ID"}."\t$1\t$4\tBP\n" ;
+		}
+		elsif($2 eq "F"  ){
+			print OUT_go $outFile{"ID"}."\t$1\t$4\tMF\n" ;
+		}
+	   }
+	}
+	elsif($line=~/^DR\s+KEGG;\s+([\w:]+);/){
+	  if($output==1){               
+		  print OUT_kegg $outFile{"ID"}."\t$1\n" ;		
+		  if( exists($KEGG_path{$1}) ){			
+		    if( $KEGG_path{$1} ne "" ){
+		        @tmp_path = split(/;/,$KEGG_path{$1})	;
+		        foreach $tmp_path (@tmp_path){
+		        	print OUT_path $outFile{"ID"}."\t$tmp_path\n" ;
+		        }
+	            }					
+		  }
+	  }	
+	}
+	elsif($line=~/^DR\s+InterPro;\s+(\w+);/){
+	   if($output==1){               	
+		print OUT_interpro $outFile{"ID"}."\t$1\n" ;
+	   }
+	}	
+	elsif($line=~/^DR\s+Pfam;\s+(\w+);/){
+	   if($output==1){               
+		print OUT_pfam $outFile{"ID"}."\t$1\n" ;
+	   }
+	}
+	elsif($line=~/^DR\s+PROSITE;\s+(\w+);/){
+	   if($output==1){               	
+		print OUT_prosite $outFile{"ID"}."\t$1\n" ;
+	   }	
+	}	
+	elsif($line=~/^DR\s+PDB;\s+(\w+);/){
+	   if($output==1){               
+		print OUT_pdb $outFile{"ID"}."\t$1\n" ;
+	   }	
+	}
+	elsif($line=~/^CC\s+\-\-\-\-\-/){
+		$CC_tag=1;
+	}
+	elsif($line=~/^CC(.*)/ and $CC_tag==0){
+		$CC=$CC.$1;
+	}
+	elsif($line=~/^FT\s+/){
+		$name=substr($line,5,8);
+		$name=~s/\s+//g;
+		if($name ne ""){
+			$i++ ;
+			$name[$i]=$name;
+			$start[$i]=substr($line,14,6);
+			$end[$i]=substr($line,21,6);
+			$start[$i]=~s/\s+//g;
+			$end[$i]=~s/\s+//g;
+			if( length($line)<34 ){
+				$name_des[$i]="";
+			}
+			elsif( length($line)>=75 ){
+				$name_des[$i]=substr($line,34,75);
+			}
+			else{
+				$name_des[$i]=substr($line,34,length($line));
+			}
+		}
+		else{
+			$name_des[$i]=$name_des[$i].substr($line,34,75);
+		}
+		$name_des[$i]=~s/\s+/ /g;
+		$name_des[$i]=~s/;/,/g;
+	}
+	elsif($line=~/^SQ\s+SEQUENCE.*\s(\d+)\s+MW;/){
+		$outFile{"MW"} = $1;
+		$tag=1;
+	}
+	elsif($tag==1){
+		if( $outFile{"SQ"} eq "" ){
+			$outFile{"SQ"}=$line;
+		}else{
+			$outFile{"SQ"}=$outFile{"SQ"}.$line;
+		}
+	}
+	
+  if($line=~/^\/\//){
+      if($output==1){
+		$outFile{"ACs"} =~s/\s+//g;	
+		@tmp_ACs = split(/;/,$outFile{"ACs"})	;
+                foreach $tmp_AC (@tmp_ACs) {
+                  print OUT_spac $outFile{"ID"}."\t$tmp_AC\n" ;
+                }       
+		$outFile{"AC"} = $tmp_ACs[0] ;						
+		@temp_gene=split(/;/,$temp_gene);
+		for($g=0;$g<@temp_gene;$g++){
+			if($temp_gene[$g]=~/\w+\=(.+)/){
+				print OUT_alias $outFile{"ID"}."\t$1\n" ;
+			}
+		}
+		@CC=split(/\-!\- /,$CC);
+		foreach $temp_CC (@CC) {
+			if($temp_CC=~/^FUNCTION:\s+(.*)/){
+				$outFile{"FUNCTION"} = $1;
+				$outFile{"FUNCTION"} =~s/\s+/ /g;
+			}
+			elsif($temp_CC=~/^INTERACTION:(.*)/){
+				 @temp_inter = split(/;/,$1);
+				 foreach $temp_inter(@temp_inter){
+					 if($temp_inter=~/^\s+(\w+):/){
+					 	print OUT_int $outFile{"ID"}."\t$1\n" ;
+					 }
+				 }
+			}
+			elsif($temp_CC=~/^SUBCELLULAR LOCATION:\s+(.*)/){
+				$outFile{"SUBCELLULAR"} = $1;
+				$outFile{"SUBCELLULAR"} =~s/\s+/ /g;
+			}
+			elsif($temp_CC=~/^TISSUE SPECIFICITY:\s+(.*)/){
+				$outFile{"TISSUE"} = $1;
+				$outFile{"TISSUE"} =~s/\s+/ /g;
+			}
+			elsif($temp_CC=~/^DISEASE:\s+(.*)/){
+				$outFile{"DISEASE"} = $1;
+				$outFile{"DISEASE"} =~s/\s+/ /g;
+			}
+		}
+    		for($k=0;$k<=$i;$k++){
+			if(($name[$k] eq "MOD_RES") or $name[$k] eq "LIPID" or $name[$k] eq "CARBOHYD" or $name[$k] eq "DISULFID" or $name[$k] eq "CROSSLNK" ){
+					if($name_des[$k]=~/By similarity/){
+						print OUT_ptm $outFile{"ID"}."\t$name[$k]\t$start[$k]\t$end[$k]\t$name_des[$k]\tBy similarity\n" ;
+					}
+          elsif($name_des[$k]=~/Potential/){
+                 print OUT_ptm $outFile{"ID"}."\t$name[$k]\t$start[$k]\t$end[$k]\t$name_des[$k]\tPotential\n" ;
+          }
+          elsif($name_des[$k]=~/Probable/){						
+                   print OUT_ptm $outFile{"ID"}."\t$name[$k]\t$start[$k]\t$end[$k]\t$name_des[$k]\tProbable\n" ;
+          }
+					else{
+					  print OUT_ptm $outFile{"ID"}."\t$name[$k]\t$start[$k]\t$end[$k]\t$name_des[$k]\tExperimental\n" ;						
+					}
+			}
+		}
+	$outFile{"SQ"}=~s/[\s\n\/]//g;
+        &writeOut ;
+      }  	
+      &setOut ;
+  }
+}
+close OUT_basic ;
+close OUT_seq;
+close OUT_de ;
+close OUT_spac ;
+close OUT_pubmed ;
+close OUT_refseq ;
+close OUT_geneid ;
+close OUT_go ;
+close OUT_pfam ;
+close OUT_interpro ;
+close OUT_pdb ;
+close OUT_kegg ;
+close OUT_path ;
+close OUT_prosite ;
+close OUT_pdb ;
+close OUT_alias ;
+close OUT_int ;
+close OUT_ptm ;
+
+sub writeOut {
+  print OUT_basic $outFile{"ID"}, "\t", 
+  $outFile{"AC"}, "\t",     
+	$outFile{"LEN"}, "\t",  
+	$outFile{"MW"}, "\t", 
+  $outFile{"GS"}, "\t", 
+  $outFile{"UniGene"}, "\t",    
+	$outFile{"FUNCTION"}, "\t",
+	$outFile{"SUBCELLULAR"}, "\t",
+	$outFile{"TISSUE"}, "\t",
+	$outFile{"DISEASE"}, "\n" ;	
+	print OUT_seq $outFile{"ID"}, "\t", 
+	$outFile{"SQ"}, "\n" ;	
+}
+
+sub setOut{
+	$temp_gene = "" ;
+  $CC = "" ;
+  $CC_tag = 0 ;
+  $i = -1;
+  $tag=0;
+    $output=0;	
+  $outFile{"OS"} = "";
+	$outFile{"ID"} = "";
+	$outFile{"AC"} = "";
+	$outFile{"ACs"} = "";
+	$outFile{"LEN"} = "";
+	$outFile{"MW"} = "";	
+	$outFile{"GS"} = "";	
+	$outFile{"UniGene"} = "";
+	$outFile{"FUNCTION"} = "";	
+	$outFile{"SUBCELLULAR"} = "";
+	$outFile{"TISSUE"} = "";
+	$outFile{"DISEASE"} = "";
+	$outFile{"SQ"} = "";	
+}

@@ -1,0 +1,53 @@
+# This is part of the parser to find protein ID mapping with equal sequences
+
+while(<In_Query>){
+	chomp;	
+	if(/^> (.*)/){
+	  $query{$1} = "" ;
+	}
+	else{
+		$query{$1} = $query{$1}.$_ ;
+	}
+}
+close In_Query;
+
+while(<In_Subject>){
+	chomp;	
+	if(/^> (.*)/){
+	  $subject{$1} = "" ;
+	}
+	else{
+		$subject{$1} = $subject{$1}.$_ ;
+	}
+}
+close In_Subject;
+
+foreach $tmp (keys (%query) ){
+	if( !exists($seq2query{$query{$tmp}}) ){
+		$seq2query{$query{$tmp}} = $tmp ;
+	}
+	else{
+		$seq2query{$query{$tmp}} = $seq2query{$query{$tmp}}.";".$tmp ;
+	}
+}
+
+
+
+
+foreach $tmp (keys (%subject) ){
+	if( exists($seq2query{$subject{$tmp}}) ){
+		$equal1{$subject{$tmp}} = $seq2query{$subject{$tmp}} ;
+		if( !exists($equal2{$subject{$tmp}}) ){
+			$equal2{$subject{$tmp}} = $tmp ;
+		}
+		else{
+			$equal2{$subject{$tmp}} = $equal2{$subject{$tmp}}.";".$tmp ;
+		}
+	}
+}
+
+print Out "$queryName\t$subjectName\n" ;
+foreach $tmp (keys (%equal1) ){
+		print Out $equal1{$tmp}."\t".$equal2{$tmp}."\n" ;
+}
+close Out;

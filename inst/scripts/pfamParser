@@ -1,0 +1,44 @@
+# This is part of the parser for Pfam data 
+
+
+while($line=<IN>){
+	chomp($line);
+	if($line=~/^ID\s+(\w+)\s+/){
+		$ID = $1;
+	}
+	elsif( $line=~/^OS\s+([\w\s]+)\s*\W/ ){
+		$OS = $1 ;
+		$OS =~s/\s+$// ;
+	}
+	if(($line=~/^\/\//) and ($OS eq $organism) ){
+		$hash{$ID} = 1 ;
+	}
+}
+
+print OUT
+"Swiss_AC\tSwiss_ID\tPF_domain\tdomain_name\tdomain_description\tdomain_start\tdomain_end\n";
+while($line=<DATA>){
+	if($line=~/>([\w_]+)\s.*==\|\s+(\w+)\.\d+\s+(\d+)\s+a/){
+		$protein= "$1\t$2\t";	
+		$ID = $1 ;	
+		if( $hash{$ID}==1 ){
+		    do{
+		    	$line=<DATA> ;
+		    	chomp($line);
+		    	if($line=~/(\w+)\s+.*(PF\d+)\.\d+\s+(\S.*\S)\s\s(\d+.*)/){
+		    		$pfam="$2\t$1\t$3\t";
+		    		@temp=split(/\s+/,$4 );
+		    		foreach $temp(@temp){
+		    			@position=split(/\-/,$temp);		    			
+		    			print  OUT "$protein$pfam$position[0]\t$position[1]\n";		    			    
+        
+		    		}
+		    	}
+		    }until($line eq "");
+	   }
+	}
+}
+
+close IN ;
+close DATA;
+close OUT;

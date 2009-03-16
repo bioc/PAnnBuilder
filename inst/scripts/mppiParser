@@ -1,0 +1,76 @@
+# This is part of the parser for MIPS PPI data 
+
+print OUT "bibref\tinteractionDetection\tproteinParticipant\n" ;
+
+@lines = <DATA> ;
+chomp(@lines);
+$line = join("", @lines) ;
+@array = split(/<interaction>/,$line);
+&setOut;
+for ($i=1 ; $i<@array; $i++){
+	while( $array[$i]=~/<bibref>(.*)<\/bibref>/g ){
+		$tmp1 = $1 ;
+		while($tmp1=~/<xref>\s+<.*db=\"(\w+)\" id=\"(\w+)\".*<\/xref>/g){
+			if( $outFile{"experimentDescription"} eq "NA" ){
+				$outFile{"experimentDescription"} = $1.":".$2 ;
+			}
+			else{
+				$outFile{"experimentDescription"} = $outFile{"experimentDescription"}.";".$1.":".$2 ;
+			}
+		}
+	}
+	while($array[$i]=~/<interactionDetection>(.*)<\/interactionDetection>/g){
+		$tmp1 = $1 ;
+		while($tmp1=~/<names>\s+<shortLabel>(.*)<\/shortLabel>\s+<\/names>/g){
+			if( $outFile{"interactionDetection"} eq "NA" ){
+				$outFile{"interactionDetection"} = $1 ;
+			}
+			else{
+				$outFile{"interactionDetection"} = $outFile{"interactionDetection"}.";".$1 ;
+			}
+		}
+	}
+	if($array[$i]=~/<participantList>(.*)<\/participantList>/){
+		
+		@tmp = split(/<proteinParticipant>/,$1) ;
+		for($tmp1=1 ; $tmp1<@tmp; $tmp1++){
+			$tmp2 = $tmp[$tmp1] ;
+			$tmp3 = "" ;			
+			if($tmp2=~/<fullName>(.*)<\/fullName>/){
+				$tmp3 = $1 ;
+				$tmp3 =~s/[\t;]/, /g ;
+			}
+			if($tmp2=~/<xref>\s+<.*db=\"(\w+)\" id=\"(\w+)\".*<\/xref>/){
+				$tmp3 = $1.":".$2."@".$tmp3 ;
+			}else{
+				$tmp3 = ""."@".$tmp3 ;
+			}
+			if($tmp2=~/<organism ncbiTaxId="(\d+)" \/>/){
+				$tmp3 = $tmp3."@".$1 ;
+			}else{
+				$tmp3 = $tmp3."@"."" ;
+			}
+			if( $outFile{"proteinInteractor"} eq "NA" ){
+				$outFile{"proteinInteractor"} = $tmp3 ;
+			}			
+			else{
+				$outFile{"proteinInteractor"} = $outFile{"proteinInteractor"}.";".$tmp3 ;
+			}
+		}
+	}
+	&writeOut ;
+    	&setOut ;
+}
+close DATA;
+close OUT;
+
+sub writeOut {
+	print OUT $outFile{"experimentDescription"}, "\t", 
+	$outFile{"interactionDetection"}, "\t",  
+	$outFile{"proteinInteractor"}, "\n" ;
+}
+sub setOut{
+	$outFile{"experimentDescription"} = "NA";
+	$outFile{"interactionDetection"} = "NA";
+	$outFile{"proteinInteractor"} = "NA";
+}

@@ -1,0 +1,151 @@
+# This is part of the parser for NCBI RefSeq data 
+while(<DATA>){
+	chomp;	
+	if(/^>gi\|(\d+)\|ref\|([\w\_\.]+)\|/){
+		$locus = $2;
+		$seq{$locus} = "" ;		
+	  $GI{$locus} = $1 ;
+	}
+	else{
+		$seq{$locus} = $seq{$locus}.$_ ;
+	}
+}
+close DATA;
+
+<In_Gene2refseq> ;
+while(<In_Gene2refseq>){
+	chomp;
+	@array = split(/\t/,$_) ;
+	if( exists($seq{$array[5]}) ){
+		$gi2gene{$array[5]} = $array[1] ; 
+		$gene2gi{$array[1]} = $array[5] ;
+		if( $array[12]=~/Reference assembly/ and $array[7]=~/NC_/ ){			
+			$START{$array[1]} = $array[9] ;  
+			$END{$array[1]} = $array[10] ;    
+			$ORIENT{$array[1]} = $array[11] ; 
+		}
+	}
+}
+close(In_Gene2refseq);
+
+<In_GeneInfo> ;
+while(<In_GeneInfo>){
+	chomp;
+	@array = split(/\t/,$_) ;
+	if( exists($gene2gi{$array[1]}) ){
+		$GN{$array[1]} = $array[2] ;
+		$array[4] =~s/\|/@/g ;
+		$GS{$array[1]} = $array[4] ;		
+		$DE{$array[1]} = $array[8] ;
+		$CHR{$array[1]} = $array[6];
+	}
+}
+close(In_GeneInfo);
+
+# From KEGG Gene ID to KEGG Pathway
+while(<In_PATH>){
+	chomp;
+	@array = split(/\t/,$_);
+	$array[1] =~s/path:// ;
+	if( !exists($KEGG_path{$array[0]}) ){
+		$KEGG_path{$array[0]} = $array[1] ;
+	}
+	else{
+		$KEGG_path{$array[0]} = $KEGG_path{$array[0]}.";".$array[1]  ;
+	}
+}
+close(In_PATH);
+
+# From NCBI GI to KEGG Gene ID
+while(<In_KEGG>){
+	chomp;
+	@array = split(/\t/,$_) ;
+	$array[1] =~s/ncbi-gi:// ;
+	if( !exists($KEGG_path{$array[0]}) ){
+		$KEGG_path{$array[0]} = "NA" ;
+	}
+	$KEGG{$array[1]} = $array[0]."\t".$KEGG_path{$array[0]} ;
+}
+close(In_KEGG);
+
+# From NCBI Gene ID to GO
+<In_GO>;
+while(<In_GO>){
+	chomp;
+	@array = split(/\t/,$_);
+	if( exists($gene2gi{$array[1]}) ){
+		if($array[7] eq "Function"){
+			if( !exists($go{$array[1]}) ){
+				$go{$array[1]} = $array[2]."@".$array[3]."@"."MF" ;
+			}
+			else{
+				$go{$array[1]} = $go{$array[1]}.";".$array[2]."@".$array[3]."@"."MF" ;
+			}
+		}
+		elsif($array[7] eq "Component"){
+			if( !exists($go{$array[1]}) ){
+				$go{$array[1]} = $array[2]."@".$array[3]."@"."CC" ;
+			}
+			else{
+				$go{$array[1]} = $go{$array[1]}.";".$array[2]."@".$array[3]."@"."CC" ;
+			}
+		}
+		elsif($array[7] eq "Process"){
+			if( !exists($go{$array[1]}) ){
+				$go{$array[1]} = $array[2]."@".$array[3]."@"."BP" ;
+			}
+			else{
+				$go{$array[1]} = $go{$array[1]}.";".$array[2]."@".$array[3]."@"."BP" ;
+			}
+		}
+	}
+}
+close(In_GO);
+
+print OUT "GI", "\t", "REFSEQ", "\t", "SQ", "\t", "GENEID", "\t", 
+"CHR", "\t", "START", "\t", "END", "\t", "ORIENT", "\t", 
+"GN", "\t", "SYMBOL", "\t", "DE", "\t", "KEGG", "\t", "PATH", "\t", 
+"GO", "\n" ;  
+
+@locus = sort(keys(%seq)) ; 
+foreach $locus(@locus){	
+	if( !exists($gi2gene{$locus}) ){
+		$GeneID = "NA" ;
+	}
+	else{
+		$GeneID = $gi2gene{$locus} ;
+	}
+	if( !exists($RefSeq{$GeneID}) ){
+		$RefSeq{$GeneID} = "NA" ;	
+	}
+	if( !exists($CHR{$GeneID}) ){
+		$CHR{$GeneID} = "NA" ;
+	}
+	if( !exists($START{$GeneID}) ){
+		$START{$GeneID} = "NA";
+	}
+	if( !exists($END{$GeneID}) ){
+		$END{$GeneID} = "NA";
+	}
+	if( !exists($ORIENT{$GeneID}) ){
+		$ORIENT{$GeneID} = "NA"; 
+	}
+	if( !exists($GN{$GeneID}) ){
+		$GN{$GeneID} = "NA" ;
+	}
+	if( !exists($GS{$GeneID}) ){
+		$GS{$GeneID} = "NA" ;
+	}
+	if( !exists($DE{$GeneID}) ){
+		$DE{$GeneID} = "NA" ;
+	}
+	if( !exists($KEGG{$GI{$locus}}) ){
+		$KEGG{$GI{$locus}} = "NA\tNA" ;
+	}
+	if( !exists($go{$GeneID}) ){
+		$go{$GeneID} = "NA" ;
+	}
+	print OUT "$GI{$locus}\t$locus\t$seq{$locus}\t$GeneID\t$CHR{$GeneID}\t$START{$GeneID}\t$END{$GeneID}\t$ORIENT{$GeneID}\t$GN{$GeneID}\t$GS{$GeneID}\t$DE{$GeneID}\t$KEGG{$GI{$locus}}\t$go{$GeneID}\n" ;
+}
+close OUT;
+

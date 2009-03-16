@@ -1,0 +1,31 @@
+# This is part of the parser for processing the results of blast.
+
+while($line=<IN1>){
+	chomp($line);
+	@array = split(/\t/,$line) ;
+	$L{$array[0]} = $array[1];
+}
+
+while($line=<IN2>){
+	chomp($line);
+	@array = split(/\t/,$line) ;
+	$L{$array[0]} = $array[1];
+}
+
+@match = split(/\t/, $organism) ;
+
+print OUT "query\tsubject\tidentity\talignment_length\t".
+"mismatches\tgap openings\tq.start\tq.end\ts.start\ts.end\t".
+"e-value\tbit_score\n" ;
+while($line=<DATA>){
+	@array = split(/\t/,$line) ;
+	if (($array[2]/100 >=$match[0]) and ($array[3]/$L{$array[0]} >=$match[1]) 
+	     and ($array[3]/$L{$array[1]} >=$match[1]) ){
+		print OUT $line ;
+	}
+}
+
+close IN1;
+close IN2;
+close DATA;
+close OUT;
