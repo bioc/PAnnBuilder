@@ -84,7 +84,7 @@ PAnnBuilder 1.4.0 only builds SQLite-based annotation packages to accord with Bi
 \subsection{Installation}
 To install PAnnBuilder, user can use the installation script "PAnnBuilder.R" to 
 download the newest version and install it in R.
-<<install>>=
+<<install, eval=FALSE>>=
 biocLite("PAnnBuilder")
 library(PAnnBuilder)
 @
