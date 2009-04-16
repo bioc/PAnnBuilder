@@ -31,9 +31,9 @@ Chinese Academy of Sciences, P. R. China
 \section{Overview} 
 
 In genomic era, genome-scale experiments and data analyses require genes to be 
-annotated from different sources, an R \cite{1} package AnnBuilder was developped
+annotated from different sources, an R \cite{1} package AnnBuilder was developed
 for this purpose \cite{2}. In post genomic era, advances in proteomics highlight 
-the urgence of understanding protein language \cite{3}. However, relative to genes, 
+the urgency of understanding protein language \cite{3}. However, relative to genes, 
 AnnBuilder is limited in protein annotation due to the complexity of proteins 
 caused by 3-D strucutre, alternative splicing, modification, dynamic location 
 and other features. The package PAnnBuilder focuses on assembling proteomic 
@@ -47,7 +47,7 @@ modifications, body fluid proteomics, homolog/ortholog groups and so on.
 Additionally, PAnnBuilder allows annotation to unknown proteins based on sequence 
 similarities to other well-annotated proteins. To extend the use of PAnnBuilder, 
 54 standard R annotation packages are produced from main protein databases, 
-which are freely available for download from {\url{http://www.biosino.org/PAnnBuilder/example.jsp}}.
+which are freely available for download via biocLite.
 
 \section{Getting Started}
 
@@ -55,11 +55,11 @@ which are freely available for download from {\url{http://www.biosino.org/PAnnBu
 
 PAnnBuilder requires the support from the following items:
 \begin{enumerate}
-\item For PAnnBuilder >= 1.3.0, R >=2.7.0 is needed for building SQLite-based 
+\item For PAnnBuilder >= 1.5.0, R >=2.7.0 is needed for building SQLite-based 
 package. Dependent R packages are needed to be installed: \Rpackage{methods}, 
 \Rpackage{utils}, \Rpackage{RSQLite}, 
 \Rpackage{Biobase} (>= 1.17.0), \Rpackage{AnnotationDbi (>= 1.3.12)}. 
-If you use the installation script "PAnnBuilder.R" to install PAnnBuilder (>=1.3.0), 
+If you use the installation script "biocLite.R" to install PAnnBuilder (>=1.5.0), 
 it will automatically check these dependent packages and install missing 
 packages from CRAN or Bioconductor.
 \item Rtools is needed for Windows user. The matched version of Rtools with R can 
@@ -69,7 +69,7 @@ It can be downloaded from {\url{http://www.perl.com/download.csp}}.
 \item Program formatdb and BLASTP is needed for function \Rfunction{crossBuilder}, 
 \Rfunction{crossBuilder\_DB}, \Rfunction{pSeqBuilder}, \Rfunction{pSeqBuilder\_DB}.
 
-BLAST can be downloaded from http://www.ncbi.nlm.nih.gov/BLAST/download.shtml.
+BLAST can be downloaded from {\url{http://www.ncbi.nlm.nih.gov/BLAST/download.shtml}}.
 \end{enumerate}
 Note: It is better to have enough space for the temporary directory. The path of
 the per-session temporary directory can be acquired by:
@@ -77,20 +77,16 @@ the per-session temporary directory can be acquired by:
 tempdir() 
 @
 
-\subsection{Change}
-PAnnBuilder 1.3.0 builds environment-based and SQLite-based annotation packages.
-PAnnBuilder 1.4.0 only builds SQLite-based annotation packages to accord with Bioconductor standard annotation packages.
-
 \subsection{Installation}
-To install PAnnBuilder, user can use the installation script "PAnnBuilder.R" to 
-download the newest version and install it in R.
+The biocLite script is used to install PAnnBuilder from within R:
 <<install, eval=FALSE>>=
+source("http://bioconductor.org/biocLite.R")
 biocLite("PAnnBuilder")
+@
+<<load>>=
 library(PAnnBuilder)
 @
 Note: Web Connection is needed to install PAnnBuilder and its depended packages.
-All the codes in this vignette were tested in R 2.8.0 and 2.9.0, thus latest R 
-is recommended.
 
 \subsection{Public Data Sources}
 
@@ -174,314 +170,105 @@ follows:
 
 PAnnBuilder has powerful ability to build R package for assembling proteome 
 annotation. However, the process of building new package may be time-consuming 
-because of the downloading and parsing of large data files. To make PAnnBuilder useful 
-for any users, we have built many frequently used annotation packages in advance.
-These pre-built package can be downloaded via 
-{\url{http://www.biosino.org/PAnnBuilder/example.jsp}}.
+because of the downloading and parsing of large data files. To make PAnnBuilder
+useful for any users, we have built many frequently used annotation packages in
+advance. These pre-built packages can be downloaded via biocLite.
 
-These packages are divided into two classes: enviroment-based 
-packages built by "*Builder" functions (see Table~\ref{table:packages1}); SQLite based packages built by "*Builder\_DB" 
-functions (see Table~\ref{table:packages2}). They are widely used methods for building Bioconductor 
-meta-data packages. Each SQLite-based annotation package (identified by a ".db"
-suffix in the package name) contains a number of AnnDbBimap objects in
-place of the environment objects found in the old-style environment-based
-annotation packages. In future, SQLite-based annotation package will
-replace environment-based packages. 
+PAnnBuilder produces SQLite-based R packages using the "*Builder\_DB" 
+functions (see Table~\ref{table:packages1}). Each SQLite-based annotation
+package contains a number of AnnDbBimap objects. 
 
-The pre-built packages provide a quick start for R beginners. If one wants to analyze 
-protein set in Human IPI database, the quickest way is to download and use 
-enviroment based package "org.Hs.ipi", or SQLite based package "org.Hs.ipi.db". 
-However, if the package one wants has not been built or a new-version database is 
-released, new package should be built using functions in PAnnBuilder (See 
-Section 4 for methods of building annotation packages).
-
+The pre-built packages provide a quick start for R beginners. If one wants to
+analyze  protein set in Human IPI database, the quickest way is to download and
+use the SQLite-based package "org.Hs.ipi.db". However, if the package one wants
+has not been built or a new-version database is  released, new package should be
+built using functions in PAnnBuilder (See  Section 4 for methods of building
+annotation packages).
+\
 \begin{table}
 \footnotesize
-\caption{\label{table:packages1}Enviroment-based Annotation Packges Produced by PAnnBuilder.}
-\begin{tabular}{|p{0.23\textwidth}|p{0.18\textwidth}|p{0.12\textwidth}|p{0.17\textwidth}|p{0.15\textwidth}|p{0.15\textwidth}|}
-\hline
-\bf{Description} & \bf{R Function} & \bf{Source} & \bf{Organism} 
- & \bf{Package} & \bf{Download} \\ \hline
-\multirow{9}{0.25\textwidth}{complete and canonical annotaion for all proteins of
- a specific organism, including protein description, Entrez gene 
- identifier, KEGG pathway, gene ontology, domain, and so on.} & 
-\multirow{9}{0.2\textwidth}{pBaseBuilder} &
- \multirow{3}{0.11\textwidth}{IPI} & 
-  Homo sapiens & org.Hs.ipi &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.ipi_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.ipi_1.0.0.tar.gz}{Unix} \\
-  & & & Mus musculus & org.Mm.ipi &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.ipi_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.ipi_1.0.0.tar.gz}{Unix} \\ 
-  & & & Rattus norvegicus & org.Rn.ipi &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.ipi_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.ipi_1.0.0.tar.gz}{Unix} \\ 
- & & \multirow{3}{0.15\textwidth}{Swiss-Prot} & 
-  Homo sapiens & org.Hs.sp &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.sp_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.sp_1.0.0.tar.gz}{Unix} \\
-  & & & Mus musculus & org.Mm.sp &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.sp_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.sp_1.0.0.tar.gz}{Unix} \\
-  & & & Rattus norvegicus & org.Rn.sp &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.sp_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.sp_1.0.0.tar.gz}{Unix} \\ 
- & & \multirow{3}{0.15\textwidth}{RefSeq} & 
-  Homo sapiens & org.Hs.ref &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.ref_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.ref_1.0.0.tar.gz}{Unix} \\
-  & & & Mus musculus & org.Mm.ref &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.ref_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.ref_1.0.0.tar.gz}{Unix} \\
-  & & & Rattus norvegicus & org.Rn.ref &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.ref_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.ref_1.0.0.tar.gz}{Unix} \\ \hline 
-\multirow{3}{0.25\textwidth}{protein indentifier mapping} & 
-\multirow{3}{0.2\textwidth}{crossBuilder} & 
-\multirow{3}{0.11\textwidth}{Swiss-Prot, IPI, RefSeq} & 
-  Homo sapiens & org.Hs.cross &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.cross_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.cross_1.0.0.tar.gz}{Unix} \\
-  & & &  Mus musculus & org.Mm.cross &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.cross_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.cross_1.0.0.tar.gz}{Unix} \\
-  & & & Rattus norvegicus & org.Rn.cross &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.cross_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.cross_1.0.0.tar.gz}{Unix} \\ \hline 
-\multirow{5}{0.25\textwidth}{protein-protein or domain-domain interaction data} & 
-\multirow{5}{0.2\textwidth}{intBuilder}  
- & IntAct & & int.intact &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.intact_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.intact_1.0.0.tar.gz}{Unix} \\
- & & NCBI Gene & & int.geneint &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.geneint_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.geneint_1.0.0.tar.gz}{Unix} \\
- & & MPPI & & int.mppi &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.mppi_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.mppi_1.0.0.tar.gz}{Unix} \\
- & & 3did & & int.did &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.did_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.did_1.0.0.tar.gz}{Unix} \\
- & & Domine & & int.domine &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.domine_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.domine_1.0.0.tar.gz}{Unix} \\ \hline
-\multirow{2}{0.25\textwidth}{protein subcell location} &
-\multirow{2}{0.2\textwidth}{subcellBuilder} 
- & BaCelLo & & sc.bacello &
-  \href{http://www.biosino.org/download/PAnnBuilder/sc.bacello_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/sc.bacello_1.0.0.tar.gz}{Unix} \\
- & & DBSubLoc & & sc.dbsubloc &
-  \href{http://www.biosino.org/download/PAnnBuilder/sc.dbsubloc_1.0.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/sc.dbsubloc_1.0.0.tar.gz}{Unix} \\ \hline
-protein structure classification & scopBuilder & SCOP & 
- & scop &
- \href{http://www.biosino.org/download/PAnnBuilder/scop_1.0.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/scop_1.0.0.tar.gz}{Unix} \\ \hline
-protein post-translational modification & ptmBuilder & SysPTM &
- & sysptm &
- \href{http://www.biosino.org/download/PAnnBuilder/sysptm_1.0.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/sysptm_1.0.0.tar.gz}{Unix} \\ \hline
-body fluid protein & bfBuilder & Sys-BodyFluid & Homo sapiens
- & org.Hs.bf &
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.bf_1.0.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.bf_1.0.0.tar.gz}{Unix} \\ \hline
-homolog protein group & HomoloGeneBuilder & HomoloGene
- & & homolog &
- \href{http://www.biosino.org/download/PAnnBuilder/homolog_1.0.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/homolog_1.0.0.tar.gz}{Unix} \\ \hline
-ortholog protein group & InParanoidBuilder & InParanoid
- & Homo sapiens, Mus musculus & org.HsMm.ortholog &
- \href{http://www.biosino.org/download/PAnnBuilder/org.HsMm.ortholog_1.0.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/org.HsMm.ortholog_1.0.0.tar.gz}{Unix} \\ \hline
-peptides identified by mass spectrometry & PeptideAtlasBuilder
- & PeptideAtlas & Homo sapiens & org.Hs.pep &
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.pep_1.0.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.pep_1.0.0.tar.gz}{Unix} \\ \hline
-gene ontology & GOABuilder & GOA & Homo sapiens & org.Hs.goa &
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.goa_1.0.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.goa_1.0.0.tar.gz}{Unix} \\ \hline
-identifier and name & dNameBuilder & & & dName & 
- \href{http://www.biosino.org/download/PAnnBuilder/dName_1.0.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/dName_1.0.0.tar.gz}{Unix} \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}
-\footnotesize
-\caption{\label{table:packages2}SQLite-based Annotation Packges Produced by PAnnBuilder.}
+\caption{\label{table:packages1}SQLite-based Annotation Packges Produced by PAnnBuilder.}
 \begin{center}
 \begin{tabular}{|p{0.23\textwidth}|p{0.18\textwidth}|p{0.12\textwidth}|p{0.17\textwidth}|p{0.15\textwidth}|p{0.15\textwidth}|}
 \hline
 \bf{Description} & \bf{R Function} & \bf{Source} & \bf{Organism} 
- & \bf{Package} & \bf{Download} \\ \hline
+ & \bf{Package} \\ \hline
 \multirow{9}{0.25\textwidth}{complete and canonical annotaion for all proteins of
  a specific organism, including protein description, Entrez gene 
  identifier, KEGG pathway, gene ontology, domain, and so on.} & 
 \multirow{9}{0.2\textwidth}{pBaseBuilder\_DB} &
  \multirow{3}{0.15\textwidth}{IPI} & 
-  Homo sapiens & org.Hs.ipi.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.ipi.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.ipi.db_1.1.0.tar.gz}{Unix} \\
-  & & & Mus musculus & org.Mm.ipi.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.ipi.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.ipi.db_1.1.0.tar.gz}{Unix} \\ 
-  & & & Rattus norvegicus & org.Rn.ipi.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.ipi.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.ipi.db_1.1.0.tar.gz}{Unix} \\ 
+  Homo sapiens & org.Hs.ipi.db \\
+  & & & Mus musculus & org.Mm.ipi.db \\ 
+  & & & Rattus norvegicus & org.Rn.ipi.db \\ 
  & & \multirow{3}{0.15\textwidth}{Swiss-Prot} & 
-  Homo sapiens & org.Hs.sp.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.sp.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.sp.db_1.1.0.tar.gz}{Unix} \\
-  & & & Mus musculus & org.Mm.sp.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.sp.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.sp.db_1.1.0.tar.gz}{Unix} \\
-  & & & Rattus norvegicus & org.Rn.sp.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.sp.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.sp.db_1.1.0.tar.gz}{Unix} \\ 
+  Homo sapiens & org.Hs.sp.db \\
+  & & & Mus musculus & org.Mm.sp.db \\
+  & & & Rattus norvegicus & org.Rn.sp.db \\ 
  & & \multirow{3}{0.15\textwidth}{RefSeq} & 
-  Homo sapiens & org.Hs.ref.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.ref.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.ref.db_1.1.0.tar.gz}{Unix} \\
-  & & & Mus musculus & org.Mm.ref.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.ref.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.ref.db_1.1.0.tar.gz}{Unix} \\
-  & & & Rattus norvegicus & org.Rn.ref.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.ref.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.ref.db_1.1.0.tar.gz}{Unix} \\ \hline 
+  Homo sapiens & org.Hs.ref.db \\
+  & & & Mus musculus & org.Mm.ref.db \\
+  & & & Rattus norvegicus & org.Rn.ref.db \\ \hline 
 \multirow{3}{0.25\textwidth}{protein indentifier mapping} & 
 \multirow{3}{0.2\textwidth}{crossBuilder\_DB} & 
 \multirow{3}{0.15\textwidth}{Swiss-Prot, IPI, RefSeq} & 
-  Homo sapiens & org.Hs.cross.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.cross.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.cross.db_1.1.0.tar.gz}{Unix} \\
-  & & &  Mus musculus & org.Mm.cross.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.cross.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Mm.cross.db_1.1.0.tar.gz}{Unix} \\
-  & & & Rattus norvegicus & org.Rn.cross.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.cross.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/org.Rn.cross.db_1.1.0.tar.gz}{Unix} \\ \hline 
+  Homo sapiens & org.Hs.cross.db \\
+  & & &  Mus musculus & org.Mm.cross.db \\
+  & & & Rattus norvegicus & org.Rn.cross.db \\ \hline 
 \multirow{5}{0.25\textwidth}{protein-protein or domain-domain interaction data} & 
 \multirow{5}{0.2\textwidth}{intBuilder\_DB}  
- & IntAct & & int.intact.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.intact.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.intact.db_1.1.0.tar.gz}{Unix} \\
- & & NCBI Gene & & int.geneint.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.geneint.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.geneint.db_1.1.0.tar.gz}{Unix} \\
- & & MPPI & & int.mppi.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.mppi.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.mppi.db_1.1.0.tar.gz}{Unix} \\
- & & 3did & & int.did.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.did.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.did.db_1.1.0.tar.gz}{Unix} \\
- & & Domine & & int.domine.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/int.domine.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/int.domine.db_1.1.0.tar.gz}{Unix} \\ \hline
+ & IntAct & & int.intact.db \\
+ & & NCBI Gene & & int.geneint.db \\
+ & & MPPI & & int.mppi.db \\
+ & & 3did & & int.did.db \\
+ & & Domine & & int.domine.db \\ \hline
 \multirow{2}{0.25\textwidth}{protein subcell location} &
 \multirow{2}{0.2\textwidth}{subcellBuilder\_DB} 
- & BaCelLo & & sc.bacello.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/sc.bacello.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/sc.bacello.db_1.1.0.tar.gz}{Unix} \\
- & & DBSubLoc & & sc.dbsubloc.db &
-  \href{http://www.biosino.org/download/PAnnBuilder/sc.dbsubloc.db_1.1.0.zip}{Window} ; 
-  \href{http://www.biosino.org/download/PAnnBuilder/sc.dbsubloc.db_1.1.0.tar.gz}{Unix} \\ \hline
+ & BaCelLo & & sc.bacello.db \\
+ & & DBSubLoc & & sc.dbsubloc.db \\ \hline
 protein structure classification & scopBuilder\_DB & SCOP & 
- & scop.db &
- \href{http://www.biosino.org/download/PAnnBuilder/scop.db_1.1.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/scop.db_1.1.0.tar.gz}{Unix} \\ \hline
+ & scop.db \\ \hline
 protein post-translational modification & ptmBuilder\_DB & SysPTM &
- & sysptm.db &
- \href{http://www.biosino.org/download/PAnnBuilder/sysptm.db_1.1.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/sysptm.db_1.1.0.tar.gz}{Unix} \\ \hline
+ & sysptm.db \\ \hline
 body fluid protein & bfBuilder\_DB & Sys-BodyFluid & Homo sapiens
- & org.Hs.bf.db &
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.bf.db_1.1.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.bf.db_1.1.0.tar.gz}{Unix} \\ \hline
+ & org.Hs.bf.db \\ \hline
 homolog protein group & HomoloGeneBuilder\_DB & HomoloGene
- & & homolog.db &
- \href{http://www.biosino.org/download/PAnnBuilder/homolog.db_1.1.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/homolog.db_1.1.0.tar.gz}{Unix} \\ \hline
+ & & homolog.db \\ \hline
 ortholog protein group & InParanoidBuilder\_DB & InParanoid
- & Homo sapiens, Mus musculus & org.HsMm.ortholog.db &
- \href{http://www.biosino.org/download/PAnnBuilder/org.HsMm.ortholog.db_1.1.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/org.HsMm.ortholog.db_1.1.0.tar.gz}{Unix} \\ \hline
+ & Homo sapiens, Mus musculus & org.HsMm.ortholog.db \\ \hline
 peptides identified by mass spectrometry & PeptideAtlasBuilder\_DB
- & PeptideAtlas & Homo sapiens & org.Hs.pep.db &
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.pep.db_1.1.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.pep.db_1.1.0.tar.gz}{Unix} \\ \hline
-gene ontology & GOABuilder\_DB & GOA & Homo sapiens & org.Hs.goa.db &
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.goa.db_1.1.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/org.Hs.goa.db_1.1.0.tar.gz}{Unix} \\ \hline
-identifier and name & dNameBuilder\_DB & & & dName.db & 
- \href{http://www.biosino.org/download/PAnnBuilder/dName.db_1.1.0.zip}{Window} ; 
- \href{http://www.biosino.org/download/PAnnBuilder/dName.db_1.1.0.tar.gz}{Unix} \\ \hline
+ & PeptideAtlas & Homo sapiens & org.Hs.pep.db \\ \hline
+gene ontology & GOABuilder\_DB & GOA & Homo sapiens & org.Hs.goa.db \\ \hline
+identifier and name & dNameBuilder\_DB & & & dName.db \\ \hline
 \end{tabular}
 \end{center}
 \end{table}
 
 \subsubsection{Using annotation data package}
-The general way of using enviroment-based annotation data package is the following:
+SQLite-based *.db packages are capable of flexible data queries, reverse mapping,
+and  data filtering. Vignette of "AnnotationDbi" detailedly described  how to use
+SQLite based packages
+({\url{http://www.bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/AnnotationDbi.pdf}}). 
+Here package "org.Hs.ipi.db" produced by PAnnBuilder is illustrated as an example
+in the following code chuck.
 \begin{enumerate}
-\item Install and load annotation package. Package "org.Hs.ipi" is used as an example,
- other packages can be derived accordingly.
-<<exampleInstall1>>=
-if( .Platform$OS.type == "windows" ){
-  ## For Windows users, please use *.zip package:
-  tmpFile <- paste("http://www.biosino.org/download/PAnnBuilder",
-             "org.Hs.ipi.db_1.0.0.zip", sep="/")
-  tmpPath <- file.path(tempdir(),"org.Hs.ipi.db_1.0.0.zip") 
-}else{
-  ## For Unix users, please use *.tar.gz package:
-  tmpFile <- paste("http://www.biosino.org/download/PAnnBuilder",
-             "org.Hs.ipi.db_1.1.0.tar.gz", sep="/")
-  tmpPath <- file.path(tempdir(),"org.Hs.ipi.db_1.1.0.tar.gz")
-}
-
-## Download, install and load annotation package
-download.file(tmpFile, tmpPath) 
-install.packages(tmpPath,repos = NULL) 
-library(org.Hs.ipi.db) # Load annotation package
+\item Install and load *.db annotation package.
+<<exampleInstall1, eval=FALSE>>=
+biocLite("org.Hs.ipi.db")
+@
+<<exampleLoad1>>=
+library(org.Hs.ipi.db)
 @
 \item Browse data in the package.
 <<help>>=
-library(help=org.Hs.ipi.db)
 ?org.Hs.ipiGENEID
 @
-\item Convert the environment object into a "list" object, and get values  
-by index or name.
+\item Convert object into a "list" object, and get values by index or name.
 <<data1>>=
 xx <- as.list(org.Hs.ipiGENEID)
 xx[!is.na(xx)][1:3]
 xx[["IPI00792103.1"]]
 @
-\end{enumerate}
-
-For SQLite-based *.db packages, more flexible data query, reverse mapping, and 
-data filtering and can be performed. Vignette of "AnnotationDbi" detailedly described 
-how to use SQLite based packages ({\url{http://www.bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/AnnotationDbi.pdf}}). 
-Here package "org.Hs.ipi.db" produced by PAnnBuilder is illustrated as an example 
-in the following code chuck.
-\begin{enumerate}
-\item Install and load *.db annotation package.
-<<exampleInstall2>>=
-if( .Platform$OS.type == "windows" ){
-  ## For Windows users, please use *.zip package:
-  tmpFile <- paste("http://www.biosino.org/download/PAnnBuilder",
-             "org.Hs.ipi.db_1.1.0.zip",sep="/")
-  tmpPath <- file.path(tempdir(),"org.Hs.ipi.db_1.1.0.zip") 
-}else{
-  ## For Unix users, please use *.tar.gz package:
-  tmpFile <- paste("http://www.biosino.org/download/PAnnBuilder",
-             "org.Hs.ipi.db_1.1.0.tar.gz",sep="/")
-  tmpPath <- file.path(tempdir(),"org.Hs.ipi.db_1.1.0.tar.gz")
-}
-
-## Download, install and load annotation package
-download.file(tmpFile, tmpPath) 
-install.packages(tmpPath,repos = NULL) 
-library(org.Hs.ipi.db)
-@
-
 \item Specific utilities for SQLite-based *.db packages.
 <<data2>>=
 ## Access the data in table (data.frame) format via function "toTable".
@@ -531,7 +318,7 @@ and release/version information. URLs of supported databases are stored in
 \subsection{Parsing and Writing Data}
 
 Parsing is a key step to convert original data file to R object. Sometimes R is 
-directlly used to parse and write data. But for large data file or complicated 
+directly used to parse and write data. But for large data file or complicated 
 data format, perl is firstly employed to quickly process data, and then R 
 function reads the result file into R objects. 
 
@@ -560,9 +347,9 @@ perl program via R.
 Besides using perl program, R functions also parse data from simple data file and 
 store them as R environment objects or Bimap objects.
 \begin{itemize}
-\item \Rfunction{createEmptyDPkg} - create an empty R packge at given directory.
+\item \Rfunction{createEmptyDPkg} - create an empty R package at given directory.
 \item \Rfunction{writeSQ} - write sequence data into R package.
-\item \Rfunction{writeName} - parse mulitple data file, and write the mapping of 
+\item \Rfunction{writeName} - parse multiple data file, and write the mapping of 
  id and name into R package. It employs \Rfunction{writeGOName}, 
  \Rfunction{writeKEGGName}, \Rfunction{writePFAMName},  
  \Rfunction{writeINTERPROName} and \Rfunction{writeTAXName} to 
@@ -583,7 +370,7 @@ store them as R environment objects or Bimap objects.
 \item \Rfunction{writePtmData} - parse database involving protein 
   post-translational modifications, and write into R package. It employs 
   \Rfunction{writeSYSPTMData} to write data from SysPTM database.
-\item \Rfunction{writeBfData} - write data involving body fulids proteomics 
+\item \Rfunction{writeBfData} - write data involving body fluids proteomics 
   into R package. It employs \Rfunction{writeSYSBODYFLUIDData} to write data
   from Sys-BodyFluid database.
 \item \Rfunction{writeGOAData} - write gene ontology terms from GOA database 
@@ -607,7 +394,7 @@ store them as R environment objects or Bimap objects.
   \Rfunction{writeGOAData\_DB}, \Rfunction{writeHomoloGeneData\_DB},
   \Rfunction{writeInParanoidData\_DB}, and \Rfunction{writePeptideAtlasData\_DB}
   to respectively write data from Swiss-Prot, IPI, NCBI RefSeq database, and so on.
-\item \Rfunction{writeName\_DB} - parse mulitple data file, and write the mapping
+\item \Rfunction{writeName\_DB} - parse multiple data file, and write the mapping
   of id and name into SQLite-based R package. It employs \Rfunction{writeGOName\_DB}, 
   \Rfunction{writeKEGGName\_DB}, \Rfunction{writePFAMName\_DB},  
   \Rfunction{writeINTERPROName\_DB} and \Rfunction{writeTAXName\_DB} to 
@@ -615,7 +402,7 @@ store them as R environment objects or Bimap objects.
 \item \Rfunction{createSeeds} - define a list of AnnDbBimap objects which indicates
   key and value of .
 \item \Rfunction{createAnnObjs} - produce AnnDbBimap objects based on the 
-  definiation in \Rfunction{createSeeds}.
+  definition in \Rfunction{createSeeds}.
 \end{itemize}
 
 \subsection{Writing Help Documents}
@@ -626,15 +413,11 @@ R functions use these templates to create "*.rd" help file in the "man" director
 \begin{itemize}
 \item \Rfunction{getRepList} - return a list which will replace the symbols in 
  template file.
-\item \Rfunction{copyTemplates} - will produce a "*.rd" file in the "man" 
- subdirectory. Related template files in the "inst/templates" subdirectory 
- are needed for this function. 
-\item \Rfunction{copyTemplates\_DB} - implement similar function with 
- \Rfunction{copyTemplates}, and is specially developped for SQLite-based 
- annotation package. 
-\item \Rfunction{writeDescription} - write descrption file for the package.
-\item \Rfunction{writeDescription\_DB} - implement similar function with 
- \Rfunction{writeDescription}, and is specially developped for SQLite-based 
+\item \Rfunction{copyTemplates\_DB} - will produce an "*.rd" file in the "man" 
+ subdirectory for SQLite-based annotation package. Related template files in the
+ "inst/templates" subdirectory 
+ are needed for this function.  . 
+\item \Rfunction{writeDescription\_DB} - write description file for SQLite-based 
  annotation package. 
 \end{itemize}
 
@@ -642,43 +425,37 @@ R functions use these templates to create "*.rd" help file in the "man" director
 
 Basic functions described above make it possible to build proteomic annotation 
 data packages. Based on these, PAnnBuilder develops multiple sophisticated functions 
-to assemble proteomic annotaion data. Each function is implemented by two 
-R functions: "*Builder" for R-environment based package and "*Builder\_DB" for SQLite
-based package.
+to assemble proteomic annotation data. Each function is implemented by the
+"*Builder\_DB" R functions.
 \begin{itemize}
-\item \Rfunction{pBaseBuilder}, \Rfunction{pBaseBuilder\_DB} - build annotation 
- data packages for primary protein database such as SwissProt, TREMBL, IPI or 
- NCBI RefSeq protein data. 
-\item \Rfunction{pSeqBuilder}, \Rfunction{pSeqBuilder\_DB} - build annotation
- data packages for query protein sequences based on sequence similarity.
-\item \Rfunction{crossBuilder}, \Rfunction{crossBuilder\_DB} - build annotation
- data packages for protein id mapping in SwissProt, Trembl, IPI and NCBI Refseq
- databases. 
-\item \Rfunction{subcellBuilder}, \Rfunction{subcellBuilder\_DB} - build 
- annotation data packages for protein subcellular location from BaCelLo or 
- DBSubLoc database.
-\item \Rfunction{HomoloGeneBuilder}, \Rfunction{HomoloGeneBuilder\_DB} - build 
- annotation data packages for homolog protein group from NCBI HomoloGene database.
-\item \Rfunction{InParanoidBuilder}, \Rfunction{InParanoidBuilder\_DB} - build
- annotation data packages for ortholog protein group between two given organisms
- from InParanoid database.
-\item \Rfunction{GOABuilder}, \Rfunction{GOABuilder\_DB} - build annotation data
- packages for mapping proteins of UniProt to Gene Ontolgy from GOA database.
-\item \Rfunction{scopBuilder}, \Rfunction{scopBuilder\_DB} - build annotation
- data packages for Structural Classification of Proteins.
-\item \Rfunction{intBuilder}, \Rfunction{intBuilder\_DB} - build annotation data
- packages for protein-protein or domain-domain interaction from IntAct, MPPI, 
- 3DID, DOMINE or NCBI Gene interaction database.
-\item \Rfunction{PeptideAtlasBuilder}, \Rfunction{PeptideAtlasBuilder\_DB} - 
- build annotation data packages for experimentally identified peptides from 
- PeptideAtlas database.
-\item \Rfunction{ptmBuilder}, \Rfunction{ptmBuilder\_DB} - build annotation data
- packages for post-translational modifications from SysPTM database.
-\item \Rfunction{bfBuilder}, \Rfunction{bfBuilder\_DB} - build annotation data
- packages for proteins in body fluids from SysBodyFluid database.
-\item \Rfunction{dNameBuilder}, \Rfunction{dNameBuilder\_DB} - build annotation
- data packages for mapping between entry ID and name from GO, KEGG, Pfam, 
- InterPro and NCBI Taxonomy databases.
+\item \Rfunction{pBaseBuilder\_DB} - build annotation data packages for primary
+ protein database such as SwissProt, TREMBL, IPI or NCBI RefSeq protein data. 
+\item \Rfunction{pSeqBuilder\_DB} - build annotation data packages for query
+ protein sequences based on sequence similarity.
+\item \Rfunction{crossBuilder\_DB} - build annotation data packages for protein
+ id mapping in SwissProt, Trembl, IPI and NCBI Refseq databases. 
+\item \Rfunction{subcellBuilder\_DB} - build annotation data packages for
+ protein subcellular location from BaCelLo or DBSubLoc database.
+\item \Rfunction{HomoloGeneBuilder\_DB} - build annotation data packages for
+ homolog protein group from NCBI HomoloGene database.
+\item \Rfunction{InParanoidBuilder\_DB} - build annotation data packages for
+ ortholog protein group between two given organisms from InParanoid database.
+\item \Rfunction{GOABuilder\_DB} - build annotation data packages for mapping
+ proteins of UniProt to Gene Ontolgy from GOA database.
+\item \Rfunction{scopBuilder\_DB} - build annotation data packages for
+ Structural Classification of Proteins.
+\item \Rfunction{intBuilder\_DB} - build annotation data packages for
+ protein-protein or domain-domain interaction from IntAct, MPPI, 3DID, DOMINE
+ or NCBI Gene interaction database.
+\item \Rfunction{PeptideAtlasBuilder\_DB} - build annotation data packages for
+ experimentally identified peptides from PeptideAtlas database.
+\item \Rfunction{ptmBuilder\_DB} - build annotation data packages for
+ post-translational modifications from SysPTM database.
+\item \Rfunction{bfBuilder\_DB} - build annotation data packages for proteins
+ in body fluids from SysBodyFluid database.
+\item \Rfunction{dNameBuilder\_DB} - build annotation data packages for mapping
+ between entry ID and name from GO, KEGG, Pfam, InterPro and NCBI Taxonomy
+ databases.
 \end{itemize}
 
 \section{Building Annotation Data Packages}
@@ -702,9 +479,9 @@ author[["maintainer"]] <- "Hong Li <sysptm@gmail.com>"
 \begin{description}
 \item[pBaseBuilder\_DB] builds annotation data packages for proteins in three primary
  protein databases (SwissProt, IPI, RefSeq). It is a convenient way to obtain 
- complete and canonical annotaion, including protein description, Entrez gene 
+ complete and canonical annotation, including protein description, Entrez gene 
  identifier, KEGG pathway, gene ontology, domain, coordinates on chromosomes 
- and so on. For example, if you want to bulid annotation package for Mouse IPI 
+ and so on. For example, if you want to build annotation package for Mouse IPI 
  database, you can use codes as follows:
 <<pBaseBuilder, eval=FALSE>>=
  ## Build SQLite based annotation package "org.Mm.ipi.db" 
@@ -732,11 +509,10 @@ used to build R package by "R CMD build" command.
 
 \item[pSeqBuilder\_DB] uses blast to calculate sequence similarity between query 
 proteins and subject proteins, then assign annotation for query protein
-according to existing annotation of its similar proteins. pSeqBuilder\_DB is useful for 
-proteins which have not well annotated. Following code chunk gives an example 
-for annotation query proteins by pSeqBuilder\_DB. Needed R packages \Rpackage{org.Hs.sp.db}, 
-\Rpackage{org.Hs.ipi.db}, can be downloaded from
-http://www.biosino.org/PAnnBuilder/example.jsp and installed on Unix or Windows.
+according to existing annotation of its similar proteins. pSeqBuilder\_DB is
+useful for  proteins which have not well annotated. Following code chunk gives
+an example for annotation query proteins by pSeqBuilder\_DB. Needed R packages
+\Rpackage{org.Hs.sp.db},  \Rpackage{org.Hs.ipi.db}, can be downloaded via biocLite.
 <<pSeqBuilder, eval=FALSE>>=
 ## Read query sequence.
 tmp = system.file("data", "query.example", package="PAnnBuilder")
@@ -754,42 +530,18 @@ names(match) <- c("e","c","i")
 
 ## Install packages "org.Hs.sp.db", "org.Hs.ipi.db".
 if( !require("org.Hs.sp.db") ){
-  if( .Platform$OS.type == "windows" ){
-    ## For Windows users, please use *.zip package:
-    tmpFile <- paste("http://www.biosino.org/download/PAnnBuilder",
-               "org.Hs.sp.db_1.1.0.zip",sep="/")
-    tmpPath <- file.path(tempdir(),"org.Hs.sp.db_1.1.0.zip") 
-  }else{
-    ## For Unix users, please use *.tar.gz package:
-    tmpFile <- paste("http://www.biosino.org/download/PAnnBuilder",
-               "org.Hs.sp.db_1.1.0.tar.gz",sep="/")
-    tmpPath <- file.path(tempdir(),"org.Hs.sp.db_1.1.0.tar.gz")
-  }
-  download.file(tmpFile, tmpPath) 
-  install.packages(tmpPath,repos = NULL) 
+  biocLite("org.Hs.sp.db")
 }
 if( !require("org.Hs.ipi.db") ){
-  if( .Platform$OS.type == "windows" ){
-    ## For Windows users, please use *.zip package:
-    tmpFile <- paste("http://www.biosino.org/download/PAnnBuilder",
-               "org.Hs.ipi.db_1.1.0.zip",sep="/")
-    tmpPath <- file.path(tempdir(),"org.Hs.ipi.db_1.1.0.zip") 
-  }else{
-    ## For Unix users, please use *.tar.gz package:
-    tmpFile <- paste("http://www.biosino.org/download/PAnnBuilder",
-               "org.Hs.ipi.db_1.1.0.tar.gz",sep="/")
-    tmpPath <- file.path(tempdir(),"org.Hs.ipi.db_1.1.0.tar.gz")
-  }
-  download.file(tmpFile, tmpPath) 
-  install.packages(tmpPath,repos = NULL) 
+  biocLite("org.Hs.ipi.db")
 }
 
 ## Use packages "org.Hs.sp.db", "org.Hs.ipi.db" to produce annotation  
 ## R package for query sequence.
-  annPkgs = c("org.Hs.sp.db","org.Hs.ipi.db")  
-  seqName = c("org.Hs.spSEQ","org.Hs.ipiSEQ")  
-  pSeqBuilder_DB(query, annPkgs, seqName, blast, match, 
-  prefix="test1", pkgPath, version, author)  
+annPkgs <- c("org.Hs.sp.db","org.Hs.ipi.db")  
+seqName <- c("org.Hs.spSEQ","org.Hs.ipiSEQ")  
+pSeqBuilder_DB(query, annPkgs, seqName, blast, match, prefix="test1",
+               pkgPath, version, author)  
 @
 \end{description}
 
