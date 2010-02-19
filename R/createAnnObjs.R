@@ -1355,6 +1355,17 @@ createSeeds <- function(type){
                           )                            
                      ),
                      list(
+                          objName="PROSITE2DE",
+                          Class="AnnDbBimap",
+                          L2Rchain=list(
+                              list(
+                                  tablename="prosite", 
+                                  Lcolname="prosite_id",
+                                  Rcolname="prosite_de"                            
+                              )
+                          )                            
+                     ),
+                     list(
                           objName="INTERPRO2NAME",
                           Class="AnnDbBimap",
                           L2Rchain=list(

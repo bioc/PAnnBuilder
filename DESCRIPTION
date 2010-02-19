@@ -1,39 +1,39 @@
 Package: PAnnBuilder
-Version: 1.9.0
+Version: 1.10.0
 Title: Protein annotation data package builder
-Author: Li Hong lihong@sibs.ac.cn
-Maintainer: Li Hong <sysptm@gmail.com>
+Author: Li Hong lihong@sibs.ac.cn 
+Maintainer: Li Hong <sysptm@gmail.com> 
 Depends: R (>= 2.7.0), methods, utils, RSQLite,
          Biobase (>= 1.17.0), AnnotationDbi (>= 1.3.12)
-Imports: methods, utils, Biobase, DBI, RSQLite
-Suggests: org.Hs.ipi.db, org.Hs.sp.db
+Imports: methods, utils, Biobase, DBI, RSQLite                                     
 Description: Processing annotation data from public data repositories
-        and building annoation data packages.
+        and building protein-centric annoation data packages.
 Keyword: annotation, proteomics
 biocViews: Annotation, Proteomics
 License: LGPL (>= 2.0)
 URL: http://www.biosino.org/PAnnBuilder
 Collate: initClasses.R
          zzz.R
-         GOABuilder_DB.R   
-         HomoloGeneBuilder_DB.R
+         GOABuilder_DB.R                  
+         HomoloGeneBuilder_DB.R         
          InParanoidBuilder_DB.R         
-         PeptideAtlasBuilder_DB.R
+         PeptideAtlasBuilder_DB.R                  
          bfBuilder_DB.R
-         createAnnObjs.R
-         crossBuilder_DB.R
+         createAnnObjs.R         
+         crossBuilder_DB.R         
          dNameBuilder_DB.R
-         getSrcUrl.R
+         getSrcUrl.R         
          intBuilder_DB.R
          loadFromUrl.R
-         makeLLDB.R
-         pBaseBuilder_DB.R
+         makeLLDB.R         
+         pBaseBuilder_DB.R         
          pSeqBuilder_DB.R
-         processData.R
-         ptmBuilder_DB.R
-         scopBuilder_DB.R
-         subcellBuilder_DB.R
+         processData.R         
+         ptmBuilder_DB.R         
+         scopBuilder_DB.R         
+         subcellBuilder_DB.R         
          writeData_DB.R
-         writeManPage.R
+         writeManPage.R         
 ZipData: no
 LazyLoad: yes
+

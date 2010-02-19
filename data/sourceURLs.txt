@@ -22,3 +22,4 @@ PeptideAtlas	http://www.peptideatlas.org/builds
 SysPTM	http://www.biosino.org/papers/SysPTM
 Sys-BodyFluid	http://www.biosino.org/papers/Sys-BodyFluid
 TAX	ftp://ftp.ncbi.nih.gov/pub/taxonomy
+PROSITE	ftp://ftp.expasy.org/databases/prosite

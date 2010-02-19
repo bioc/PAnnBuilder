@@ -13,8 +13,6 @@ createEmptyDPkg <- function(pkgName, pkgPath,
     }
 }
 
-
-
 writeMeta_DB <- function(db, repList){
   sqliteQuickSQL(db, 
    "CREATE TABLE metadata (name VARCHAR(80) PRIMARY KEY, value VARCHAR(255) );")
@@ -59,8 +57,8 @@ writeSPData_DB <- function(srcUrls, db, organism){
     outFiles <- fileMuncher_DB(tmpFile, parser=getBaseParsers("sp",db=T), 
         organism=organism)    
     for (i in names(outFiles) ){ 
-      data <- read.csv(outFiles[i],sep="\t",header=T)
-      data <- apply(data,2,function(y){y[y==""]=NA;y})
+      data <- as.matrix(read.csv(outFiles[i],sep="\t",header=T))
+      data <- apply(data,2,function(y){y[y==""]=NA; y=gsub("^\\s+","",y); y})
       dbWriteTable(db, i, data.frame(data), row.names=F)
     }
     unlink(tmpFile)
@@ -72,8 +70,8 @@ writeIPIData_DB <- function(srcUrls, db, organism){
     outFiles <- fileMuncher_DB(tmpFile, parser=getBaseParsers("ipi",db=T), 
         organism=organism)    
     for (i in names(outFiles) ){
-      data <- read.csv(outFiles[i],sep="\t",header=T)
-      data <- apply(data,2,function(y){y[y==""]=NA;y})
+      data <- as.matrix(read.csv(outFiles[i],sep="\t",header=T))
+      data <- apply(data,2,function(y){y[y==""]=NA; y=gsub("^\\s+","",y); y})      
       dbWriteTable(db, i, data.frame(data), row.names=F)
     }
     unlink(tmpFile)
@@ -85,8 +83,8 @@ writeREFSEQData_DB <- function(srcUrls, db, organism){
     outFiles <- fileMuncher_DB(tmpFile, parser=getBaseParsers("refseq",db=T), 
         organism=organism)    
     for (i in names(outFiles) ){ 
-      data <- read.csv(outFiles[i],sep="\t",header=T)
-      data <- apply(data,2,function(y){y[y==""]=NA;y})
+      data <- as.matrix(read.csv(outFiles[i],sep="\t",header=T))
+      data <- apply(data,2,function(y){y[y==""]=NA; y=gsub("^\\s+","",y); y})
       dbWriteTable(db, i, data.frame(data), row.names=F)
     }
     unlink(tmpFile)
@@ -159,7 +157,8 @@ writeSCOPData_DB <- function(srcUrls, db) {
 
 writeGENEINTData_DB <- function(srcUrls, db){
     tmpFile <- loadFromUrl(srcUrls)
-    data <- read.csv(tmpFile,header=T,sep="\t")
+    data <- as.matrix(read.csv(tmpFile,header=T,sep="\t"))
+    data <- apply(data,2,function(y){y[y==""]=NA; y=gsub("^\\s+","",y); y})
     colnames(data) <- c("A_ORGANISM", "A_GENEID", "A_AC", "A_DE", "Int_PHRASE", 
      "B_ORGANISM", "B_ID", "B_IDTYPE", "B_AC", "B_DE", "Complex_ID", 
      "Complex_IDTYPE", "Complex_DE", "PMID", "LASTMOD","GeneRIF", "Int_ID", 
@@ -427,8 +426,9 @@ writeName_DB <- function(type, srcUrls, db){
            "PFAMNAME" = return(writePFAMName_DB(srcUrls, db)),
            "INTERPRONAME" = return(writeINTERPROName_DB(srcUrls, db)),
            "TAXNAME" = return(writeTAXName_DB(srcUrls, db)),
+           "PROSITENAME" = return(writePROSITEName_DB(srcUrls, db)),
            stop("Parameter src is not correct, must be GONAME, KEGGNAME, PFAMNAME, 
-           INTERPRONAME or TAXNAME.") 
+           INTERPRONAME, PROSITE or TAXNAME.") 
     )
 }
 
@@ -452,12 +452,13 @@ writeKEGGName_DB <- function(srcUrls, db){
 }
 
 writePFAMName_DB <- function(srcUrls, db){
-    tmpFile <- loadFromUrl(srcUrls)
+    tmpFile <- loadFromUrl(srcUrls)       
     outName <- tempfile("tempOut")
     data <- read.csv(fileMuncher(outName, tmpFile, parser=
      getBaseParsers("pfamname"), organism=""), header=T, sep = "\t" )    
     colnames(data) <- c("pfam_id","pfam_name","pfam_de")
-    unlink(outName) 
+    unlink(tmpFile)
+    unlink(outName)  
     
     dbWriteTable(db, "pfam", data, row.names=F) 
 }
@@ -468,6 +469,17 @@ writeINTERPROName_DB <- function(srcUrls, db){
     colnames(data) <- c("interpro_id","interpro_name")
     unlink(tmpFile)
     dbWriteTable(db, "interpro", data, row.names=F) 
+}
+
+writePROSITEName_DB <- function(srcUrls, db){
+    tmpFile <- loadFromUrl(srcUrls)
+    outName <- tempfile("tempOut")
+    data <- read.csv(fileMuncher(outName, tmpFile, parser=
+     getBaseParsers("prositede"), organism=""), header=T, sep = "\t" )    
+    colnames(data) <- c("prosite_id","prosite_de")
+    unlink(tmpFile)
+    unlink(outName)     
+    dbWriteTable(db, "prosite", data, row.names=F) 
 }
 
 writeTAXName_DB <- function(srcUrls, db){

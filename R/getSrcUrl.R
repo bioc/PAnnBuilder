@@ -92,7 +92,7 @@ getSrcUrl <- function(src, organism=""){
         "HOMOLOGENE" = return(getHOMOLOGENEUrl()),
         "INPARANOID" = return(getINPARANOIDUrl(organism)),
         "INTERPRO" = return(getINTERPROUrl()),
-        "PFAM" = return(getPFAMUrl()),
+        "PFAM" = return(getPFAMUrl()),                
         "SCOP" = return(getSCOPUrl()),
         "PEPTIDEATLAS" = return(getPEPTIDEATLASUrl(organism)),
         "SYSPTM" = return(getSYSPTMUrl()),
@@ -101,10 +101,11 @@ getSrcUrl <- function(src, organism=""){
         "KEGGNAME" = return(getKEGGNAMEUrl()),
         "TAXNAME" = return(getTAXNAMEUrl()),
         "PFAMNAME" = return(getPFAMNAMEUrl()),
+        "PROSITENAME" = return(getPROSITENAMEUrl()),
         "INTERPRONAME" = return(getINTERPRONAMEUrl()),
         stop(paste("Src", src, "is not supported.", "Has to be sp, trembl, ipi, 
         refseq, go, goa, geneint, intact, mppi, did, domain, dbsubloc, bacello, 
-        interpro, pfam, scop, homologene, inparanoid, peptideatlas, sysptm, 
+        interpro, pfam, scop, homologene, inparanoid, peptideatlas, sysptm, prosite, 
         sysbodyfulid or ALL"))
     )
 }
@@ -315,6 +316,10 @@ getPFAMUrl <- function(){
     paste(.srcUrls("Pfam"),"swisspfam.gz", sep="/")
 }
 
+getPROSITENAMEUrl <- function(){
+    paste(.srcUrls("PROSITE"),"prosite.dat", sep="/")
+}
+
 get3DIDUrl <- function(){
     paste(.srcUrls("3DID"),"3did_flat.gz", sep="/")
 }
@@ -366,7 +371,7 @@ getTAXNAMEUrl <- function(){
 }
 
 getPFAMNAMEUrl <- function(){
-    paste(.srcUrls("Pfam"), "Pfam_ls.gz", sep="/")
+    paste(.srcUrls("Pfam"), "database_files/pfamA.txt.gz", sep="/")
 }
 
 getINTERPRONAMEUrl <- function(){
@@ -391,7 +396,7 @@ getSrcBuilt <- function(src, organism = "") {
         "DBSUBLOC" = return(getDBSUBLOCBuilt()),
         "BACELLO" = return(getBACELLOBuilt()),
         "INTERPRO" = return(getINTERPROBuilt()),
-        "PFAM" = return(getPFAMBuilt()),
+        "PFAM" = return(getPFAMBuilt()),        
         "SCOP" = return(getSCOPBuilt()),
         "HOMOLOGENE" = return(getHOMOLOGENEBuilt()),
         "INPARANOID" = return(getINPARANOIDBuilt()),
@@ -402,6 +407,7 @@ getSrcBuilt <- function(src, organism = "") {
         "KEGGNAME" = return(getKEGGNAMEBuilt()),
         "TAXNAME" = return(getTAXNAMEBuilt()),
         "PFAMNAME" = return(getPFAMNAMEBuilt()),
+        "PROSITENAME" = return(getPROSITENAMEBuilt()),
         "INTERPRONAME" = return(getINTERPRONAMEBuilt()),
         stop(paste("Source", src, "is not supported.", "Has to be sp, trembl, 
         ipi, refseq, go, goa, geneint, intact, mppi, did, domain, dbsubloc, 
@@ -669,6 +675,14 @@ getPFAMBuilt <- function(){
     pfamBuilt <- paste( paste("Release",r) , 
      unlist(strsplit(tmp, split="\\s+"))[3], sep=", ")
     pfamBuilt
+}
+
+getPROSITENAMEBuilt <- function(){
+    tmpFile <- tempfile()
+    download.file(paste(.srcUrls("PROSITE"), "ps_reldt.txt", sep="/"), tmpFile)
+    tmp <- readLines(tmpFile)
+    unlink(tmpFile)
+    tmp
 }
 
 get3DIDBuilt <- function(){

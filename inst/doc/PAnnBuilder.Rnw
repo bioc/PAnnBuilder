@@ -31,9 +31,9 @@ Chinese Academy of Sciences, P. R. China
 \section{Overview} 
 
 In genomic era, genome-scale experiments and data analyses require genes to be 
-annotated from different sources, an R \cite{1} package AnnBuilder was developed
+annotated from different sources, an R \cite{1} package AnnBuilder was developped
 for this purpose \cite{2}. In post genomic era, advances in proteomics highlight 
-the urgency of understanding protein language \cite{3}. However, relative to genes, 
+the urgence of understanding protein language \cite{3}. However, relative to genes, 
 AnnBuilder is limited in protein annotation due to the complexity of proteins 
 caused by 3-D strucutre, alternative splicing, modification, dynamic location 
 and other features. The package PAnnBuilder focuses on assembling proteomic 
@@ -55,11 +55,11 @@ which are freely available for download via biocLite.
 
 PAnnBuilder requires the support from the following items:
 \begin{enumerate}
-\item For PAnnBuilder >= 1.5.0, R >=2.7.0 is needed for building SQLite-based 
+\item For PAnnBuilder >= 1.3.0, R >=2.7.0 is needed for building SQLite-based 
 package. Dependent R packages are needed to be installed: \Rpackage{methods}, 
 \Rpackage{utils}, \Rpackage{RSQLite}, 
 \Rpackage{Biobase} (>= 1.17.0), \Rpackage{AnnotationDbi (>= 1.3.12)}. 
-If you use the installation script "biocLite.R" to install PAnnBuilder (>=1.5.0), 
+If you use the installation script "PAnnBuilder.R" to install PAnnBuilder (>=1.3.0), 
 it will automatically check these dependent packages and install missing 
 packages from CRAN or Bioconductor.
 \item Rtools is needed for Windows user. The matched version of Rtools with R can 
@@ -69,7 +69,7 @@ It can be downloaded from {\url{http://www.perl.com/download.csp}}.
 \item Program formatdb and BLASTP is needed for function \Rfunction{crossBuilder}, 
 \Rfunction{crossBuilder\_DB}, \Rfunction{pSeqBuilder}, \Rfunction{pSeqBuilder\_DB}.
 
-BLAST can be downloaded from {\url{http://www.ncbi.nlm.nih.gov/BLAST/download.shtml}}.
+BLAST can be downloaded from http://www.ncbi.nlm.nih.gov/BLAST/download.shtml.
 \end{enumerate}
 Note: It is better to have enough space for the temporary directory. The path of
 the per-session temporary directory can be acquired by:
@@ -170,24 +170,29 @@ follows:
 
 PAnnBuilder has powerful ability to build R package for assembling proteome 
 annotation. However, the process of building new package may be time-consuming 
-because of the downloading and parsing of large data files. To make PAnnBuilder
-useful for any users, we have built many frequently used annotation packages in
-advance. These pre-built packages can be downloaded via biocLite.
+because of the downloading and parsing of large data files. To make PAnnBuilder useful 
+for any users, we have built many frequently used annotation packages in advance.
+These pre-built package can be downloaded via biocLite.
 
-PAnnBuilder produces SQLite-based R packages using the "*Builder\_DB" 
-functions (see Table~\ref{table:packages1}). Each SQLite-based annotation
-package contains a number of AnnDbBimap objects. 
+These packages are divided into two classes: enviroment-based 
+packages built by "*Builder" functions (see Table~\ref{table:packages1}); SQLite based packages built by "*Builder\_DB" 
+functions (see Table~\ref{table:packages2}). They are widely used methods for building Bioconductor 
+meta-data packages. Each SQLite-based annotation package (identified by a ".db"
+suffix in the package name) contains a number of AnnDbBimap objects in
+place of the environment objects found in the old-style environment-based
+annotation packages. In future, SQLite-based annotation package will
+replace environment-based packages. 
 
-The pre-built packages provide a quick start for R beginners. If one wants to
-analyze  protein set in Human IPI database, the quickest way is to download and
-use the SQLite-based package "org.Hs.ipi.db". However, if the package one wants
-has not been built or a new-version database is  released, new package should be
-built using functions in PAnnBuilder (See  Section 4 for methods of building
-annotation packages).
-\
+The pre-built packages provide a quick start for R beginners. If one wants to analyze 
+protein set in Human IPI database, the quickest way is to download and use 
+SQLite based package "org.Hs.ipi.db". 
+However, if the package one wants has not been built or a new-version database is 
+released, new package should be built using functions in PAnnBuilder (See 
+Section 4 for methods of building annotation packages).
+
 \begin{table}
 \footnotesize
-\caption{\label{table:packages1}SQLite-based Annotation Packges Produced by PAnnBuilder.}
+\caption{\label{table:packages2}SQLite-based Annotation Packges Produced by PAnnBuilder.}
 \begin{center}
 \begin{tabular}{|p{0.23\textwidth}|p{0.18\textwidth}|p{0.12\textwidth}|p{0.17\textwidth}|p{0.15\textwidth}|p{0.15\textwidth}|}
 \hline
@@ -252,18 +257,20 @@ SQLite based packages
 Here package "org.Hs.ipi.db" produced by PAnnBuilder is illustrated as an example
 in the following code chuck.
 \begin{enumerate}
-\item Install and load *.db annotation package.
+\item Install and load annotation package. Package "org.Hs.ipi" is used as an example,
+ other packages can be derived accordingly.
 <<exampleInstall1, eval=FALSE>>=
 biocLite("org.Hs.ipi.db")
 @
 <<exampleLoad1>>=
-library(org.Hs.ipi.db)
+library(org.Hs.ipi.db) # Load annotation package
 @
 \item Browse data in the package.
 <<help>>=
 ?org.Hs.ipiGENEID
 @
-\item Convert object into a "list" object, and get values by index or name.
+\item Convert the environment object into a "list" object, and get values  
+by index or name.
 <<data1>>=
 xx <- as.list(org.Hs.ipiGENEID)
 xx[!is.na(xx)][1:3]
@@ -318,7 +325,7 @@ and release/version information. URLs of supported databases are stored in
 \subsection{Parsing and Writing Data}
 
 Parsing is a key step to convert original data file to R object. Sometimes R is 
-directly used to parse and write data. But for large data file or complicated 
+directlly used to parse and write data. But for large data file or complicated 
 data format, perl is firstly employed to quickly process data, and then R 
 function reads the result file into R objects. 
 
@@ -347,9 +354,9 @@ perl program via R.
 Besides using perl program, R functions also parse data from simple data file and 
 store them as R environment objects or Bimap objects.
 \begin{itemize}
-\item \Rfunction{createEmptyDPkg} - create an empty R package at given directory.
+\item \Rfunction{createEmptyDPkg} - create an empty R packge at given directory.
 \item \Rfunction{writeSQ} - write sequence data into R package.
-\item \Rfunction{writeName} - parse multiple data file, and write the mapping of 
+\item \Rfunction{writeName} - parse mulitple data file, and write the mapping of 
  id and name into R package. It employs \Rfunction{writeGOName}, 
  \Rfunction{writeKEGGName}, \Rfunction{writePFAMName},  
  \Rfunction{writeINTERPROName} and \Rfunction{writeTAXName} to 
@@ -370,7 +377,7 @@ store them as R environment objects or Bimap objects.
 \item \Rfunction{writePtmData} - parse database involving protein 
   post-translational modifications, and write into R package. It employs 
   \Rfunction{writeSYSPTMData} to write data from SysPTM database.
-\item \Rfunction{writeBfData} - write data involving body fluids proteomics 
+\item \Rfunction{writeBfData} - write data involving body fulids proteomics 
   into R package. It employs \Rfunction{writeSYSBODYFLUIDData} to write data
   from Sys-BodyFluid database.
 \item \Rfunction{writeGOAData} - write gene ontology terms from GOA database 
@@ -394,7 +401,7 @@ store them as R environment objects or Bimap objects.
   \Rfunction{writeGOAData\_DB}, \Rfunction{writeHomoloGeneData\_DB},
   \Rfunction{writeInParanoidData\_DB}, and \Rfunction{writePeptideAtlasData\_DB}
   to respectively write data from Swiss-Prot, IPI, NCBI RefSeq database, and so on.
-\item \Rfunction{writeName\_DB} - parse multiple data file, and write the mapping
+\item \Rfunction{writeName\_DB} - parse mulitple data file, and write the mapping
   of id and name into SQLite-based R package. It employs \Rfunction{writeGOName\_DB}, 
   \Rfunction{writeKEGGName\_DB}, \Rfunction{writePFAMName\_DB},  
   \Rfunction{writeINTERPROName\_DB} and \Rfunction{writeTAXName\_DB} to 
@@ -402,7 +409,7 @@ store them as R environment objects or Bimap objects.
 \item \Rfunction{createSeeds} - define a list of AnnDbBimap objects which indicates
   key and value of .
 \item \Rfunction{createAnnObjs} - produce AnnDbBimap objects based on the 
-  definition in \Rfunction{createSeeds}.
+  definiation in \Rfunction{createSeeds}.
 \end{itemize}
 
 \subsection{Writing Help Documents}
@@ -413,11 +420,11 @@ R functions use these templates to create "*.rd" help file in the "man" director
 \begin{itemize}
 \item \Rfunction{getRepList} - return a list which will replace the symbols in 
  template file.
-\item \Rfunction{copyTemplates\_DB} - will produce an "*.rd" file in the "man" 
- subdirectory for SQLite-based annotation package. Related template files in the
- "inst/templates" subdirectory 
- are needed for this function.  . 
-\item \Rfunction{writeDescription\_DB} - write description file for SQLite-based 
+\item \Rfunction{copyTemplates\_DB} - implement similar function with 
+ \Rfunction{copyTemplates}, and is specially developped for SQLite-based 
+ annotation package. 
+\item \Rfunction{writeDescription\_DB} - implement similar function with 
+ \Rfunction{writeDescription}, and is specially developped for SQLite-based 
  annotation package. 
 \end{itemize}
 
@@ -425,37 +432,42 @@ R functions use these templates to create "*.rd" help file in the "man" director
 
 Basic functions described above make it possible to build proteomic annotation 
 data packages. Based on these, PAnnBuilder develops multiple sophisticated functions 
-to assemble proteomic annotation data. Each function is implemented by the
-"*Builder\_DB" R functions.
+to assemble proteomic annotaion data. Each function is implemented by the 
+"*Builder\_DB" R function.
 \begin{itemize}
-\item \Rfunction{pBaseBuilder\_DB} - build annotation data packages for primary
- protein database such as SwissProt, TREMBL, IPI or NCBI RefSeq protein data. 
-\item \Rfunction{pSeqBuilder\_DB} - build annotation data packages for query
- protein sequences based on sequence similarity.
-\item \Rfunction{crossBuilder\_DB} - build annotation data packages for protein
- id mapping in SwissProt, Trembl, IPI and NCBI Refseq databases. 
-\item \Rfunction{subcellBuilder\_DB} - build annotation data packages for
- protein subcellular location from BaCelLo or DBSubLoc database.
-\item \Rfunction{HomoloGeneBuilder\_DB} - build annotation data packages for
- homolog protein group from NCBI HomoloGene database.
-\item \Rfunction{InParanoidBuilder\_DB} - build annotation data packages for
- ortholog protein group between two given organisms from InParanoid database.
-\item \Rfunction{GOABuilder\_DB} - build annotation data packages for mapping
- proteins of UniProt to Gene Ontolgy from GOA database.
-\item \Rfunction{scopBuilder\_DB} - build annotation data packages for
- Structural Classification of Proteins.
-\item \Rfunction{intBuilder\_DB} - build annotation data packages for
- protein-protein or domain-domain interaction from IntAct, MPPI, 3DID, DOMINE
- or NCBI Gene interaction database.
-\item \Rfunction{PeptideAtlasBuilder\_DB} - build annotation data packages for
- experimentally identified peptides from PeptideAtlas database.
-\item \Rfunction{ptmBuilder\_DB} - build annotation data packages for
- post-translational modifications from SysPTM database.
-\item \Rfunction{bfBuilder\_DB} - build annotation data packages for proteins
- in body fluids from SysBodyFluid database.
-\item \Rfunction{dNameBuilder\_DB} - build annotation data packages for mapping
- between entry ID and name from GO, KEGG, Pfam, InterPro and NCBI Taxonomy
- databases.
+\item \Rfunction{pBaseBuilder\_DB} - build annotation 
+ data packages for primary protein database such as SwissProt, TREMBL, IPI or 
+ NCBI RefSeq protein data. 
+\item \Rfunction{pSeqBuilder\_DB} - build annotation
+ data packages for query protein sequences based on sequence similarity.
+\item \Rfunction{crossBuilder\_DB} - build annotation
+ data packages for protein id mapping in SwissProt, Trembl, IPI and NCBI Refseq
+ databases. 
+\item \Rfunction{subcellBuilder\_DB} - build 
+ annotation data packages for protein subcellular location from BaCelLo or 
+ DBSubLoc database.
+\item \Rfunction{HomoloGeneBuilder\_DB} - build 
+ annotation data packages for homolog protein group from NCBI HomoloGene database.
+\item \Rfunction{InParanoidBuilder\_DB} - build
+ annotation data packages for ortholog protein group between two given organisms
+ from InParanoid database.
+\item \Rfunction{GOABuilder\_DB} - build annotation data
+ packages for mapping proteins of UniProt to Gene Ontolgy from GOA database.
+\item \Rfunction{scopBuilder\_DB} - build annotation
+ data packages for Structural Classification of Proteins.
+\item \Rfunction{intBuilder\_DB} - build annotation data
+ packages for protein-protein or domain-domain interaction from IntAct, MPPI, 
+ 3DID, DOMINE or NCBI Gene interaction database.
+\item \Rfunction{PeptideAtlasBuilder\_DB} - 
+ build annotation data packages for experimentally identified peptides from 
+ PeptideAtlas database.
+\item \Rfunction{ptmBuilder\_DB} - build annotation data
+ packages for post-translational modifications from SysPTM database.
+\item \Rfunction{bfBuilder\_DB} - build annotation data
+ packages for proteins in body fluids from SysBodyFluid database.
+\item \Rfunction{dNameBuilder\_DB} - build annotation
+ data packages for mapping between entry ID and name from GO, KEGG, Pfam, 
+ InterPro and NCBI Taxonomy databases.
 \end{itemize}
 
 \section{Building Annotation Data Packages}
@@ -479,9 +491,9 @@ author[["maintainer"]] <- "Hong Li <sysptm@gmail.com>"
 \begin{description}
 \item[pBaseBuilder\_DB] builds annotation data packages for proteins in three primary
  protein databases (SwissProt, IPI, RefSeq). It is a convenient way to obtain 
- complete and canonical annotation, including protein description, Entrez gene 
+ complete and canonical annotaion, including protein description, Entrez gene 
  identifier, KEGG pathway, gene ontology, domain, coordinates on chromosomes 
- and so on. For example, if you want to build annotation package for Mouse IPI 
+ and so on. For example, if you want to bulid annotation package for Mouse IPI 
  database, you can use codes as follows:
 <<pBaseBuilder, eval=FALSE>>=
  ## Build SQLite based annotation package "org.Mm.ipi.db" 
@@ -509,10 +521,10 @@ used to build R package by "R CMD build" command.
 
 \item[pSeqBuilder\_DB] uses blast to calculate sequence similarity between query 
 proteins and subject proteins, then assign annotation for query protein
-according to existing annotation of its similar proteins. pSeqBuilder\_DB is
-useful for  proteins which have not well annotated. Following code chunk gives
-an example for annotation query proteins by pSeqBuilder\_DB. Needed R packages
-\Rpackage{org.Hs.sp.db},  \Rpackage{org.Hs.ipi.db}, can be downloaded via biocLite.
+according to existing annotation of its similar proteins. pSeqBuilder\_DB is useful for 
+proteins which have not well annotated. Following code chunk gives an example 
+for annotation query proteins by pSeqBuilder\_DB. Needed R packages \Rpackage{org.Hs.sp.db}, 
+\Rpackage{org.Hs.ipi.db}, can be downloaded via biocLite.
 <<pSeqBuilder, eval=FALSE>>=
 ## Read query sequence.
 tmp = system.file("data", "query.example", package="PAnnBuilder")
@@ -528,7 +540,7 @@ names(blast) <- c("p","e","M","W","G","E","U","F")
 match <- c(0.00001, 0.9, 0.9)
 names(match) <- c("e","c","i")
 
-## Install packages "org.Hs.sp.db", "org.Hs.ipi.db".
+## Install ackages "org.Hs.sp", "org.Hs.ipi".
 if( !require("org.Hs.sp.db") ){
   biocLite("org.Hs.sp.db")
 }
@@ -538,14 +550,14 @@ if( !require("org.Hs.ipi.db") ){
 
 ## Use packages "org.Hs.sp.db", "org.Hs.ipi.db" to produce annotation  
 ## R package for query sequence.
-annPkgs <- c("org.Hs.sp.db","org.Hs.ipi.db")  
-seqName <- c("org.Hs.spSEQ","org.Hs.ipiSEQ")  
-pSeqBuilder_DB(query, annPkgs, seqName, blast, match, prefix="test1",
-               pkgPath, version, author)  
+  annPkgs = c("org.Hs.sp.db","org.Hs.ipi.db")  
+  seqName = c("org.Hs.spSEQ","org.Hs.ipiSEQ")  
+  pSeqBuilder_DB(query, annPkgs, seqName, blast, match, 
+  prefix="test1", pkgPath, version, author)  
 @
 \end{description}
 
-\item After the running of "*Builder" or "*Builder\_DB" function has been 
+\item After the running of "*Builder\_DB" function has been 
 finished, a subdirectory named "pkgName" will be produced in given "pkgPath". 
 Then the command "R CMD build" can be used to build source R package, and 
 "R CMD --binary build" can be used to build binary R package for Windows. 

@@ -55,6 +55,8 @@
 \alias{getSrcSQUrl}
 \alias{getSrcSQBuilt}
 \alias{getIPISQUrl}
+\alias{getPROSITENAMEUrl}
+\alias{getPROSITENAMEBuilt}
 \alias{getREFSEQSQUrl}
 \title{Get the Url and Release information for Diverse Databases}
 \description{
@@ -129,7 +131,7 @@ getSYSBODYFLUIDBuilt()
   \item{src}{a character string to indicate which database will be used.
     Possible values are: sp, trembl, ipi, refseq, go, goa, geneint, intact, 
     mppi, 3did, domain, dbsubloc, bacello, interpro, pfam, scop, 
-    homologene, inparanoid, peptideatlas, sysptm, sysbodyfulid or ALL.
+    homologene, inparanoid, peptideatlas, sysptm, sysbodyfulid, prosite or ALL.
   }
   \item{organism}{a character string for the name of the organism of
     concern. (eg: "Homo sapiens")}

@@ -48,8 +48,13 @@ while($line=<DATA>){
 			$outFile{"ACs"}=$outFile{"ACs"}.";".$1;
 		}
 	}
-	elsif($line=~/^DE\s+(.*)/){  
-		print OUT_de $outFile{"ID"}."\t$1\n" ;
+	elsif($line=~/^DE\s+\w+: \w+=(.*)/){  
+	  if( $outFile{"DE"} eq "" ){
+			$outFile{"DE"}=$1;
+		}
+		else{
+			$outFile{"DE"}=$outFile{"DE"}.";".$1;
+		}
 	}
 	elsif($line=~/^GN\s+(\S.*)/){
 		$temp_gene=$temp_gene.$1;
@@ -185,6 +190,10 @@ while($line=<DATA>){
                   print OUT_spac $outFile{"ID"}."\t$tmp_AC\n" ;
                 }       
 		$outFile{"AC"} = $tmp_ACs[0] ;						
+		@tmp_DE = split(/;/,$outFile{"DE"})	;
+		foreach $tmp_DE (@tmp_DE) {
+                  print OUT_de $outFile{"ID"}."\t$tmp_DE\n" ;
+    }       
 		@temp_gene=split(/;/,$temp_gene);
 		for($g=0;$g<@temp_gene;$g++){
 			if($temp_gene[$g]=~/\w+\=(.+)/){
@@ -285,6 +294,7 @@ sub setOut{
 	$outFile{"ID"} = "";
 	$outFile{"AC"} = "";
 	$outFile{"ACs"} = "";
+	$outFile{"DE"} = "";
 	$outFile{"LEN"} = "";
 	$outFile{"MW"} = "";	
 	$outFile{"GS"} = "";	

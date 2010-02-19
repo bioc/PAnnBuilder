@@ -3,17 +3,10 @@
 print OUT "PFAM\tNAME\tDE\n" ;
 while($line=<DATA>){
 	chomp($line);
-	if( $line=~/^NAME\s+(.*)/ ){
-		$name=$1;
-		$line=<DATA>;
-		if( $line=~/^ACC\s+(.*)/ ){
-			print OUT "$1\t$name\t" ;
-		}
-		$line=<DATA>;
-		if( $line=~/^DESC\s+(.*)/ ){
-			print OUT "$1" ;
-		}
-		print OUT "\n"
+	$line =~s/'//g ;
+	@array = split(/\t/,$line);	
+	if( $array[1] ne "" ){
+		print OUT "$array[1]\t$array[2]\t$array[4]\n"
 	}
 }
 close(DATA);

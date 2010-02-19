@@ -26,7 +26,7 @@ dNameBuilder_DB<- function(
         sep = ""))
   }
 
-  type <- c("GO","KEGG","PFAM","INTERPRO","TAX")
+  type <- c("GO","KEGG","PFAM","INTERPRO","TAX","PROSITE")
   type <- paste(type,"NAME",sep="")
   
   pkgName = paste(prefix,"db",sep=".")

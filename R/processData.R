@@ -19,6 +19,7 @@ getBaseParsers <- function(baseMapType, db=FALSE){
   ##     "pfamname"    pfamNameParser    parse domain id and name from Pfam
   ##     "blast"    blastParser    filter the results of blast
   ##     "interpro"    interproParser    parse data from InterPro
+  ##     "prositede"     prositeDeParser	parse domain id and description from PROSITE
   ##
   ## db - a boolean to indicate whether the parser of "sqlite based package" 
   ##     will be used.
@@ -42,6 +43,7 @@ getBaseParsers <- function(baseMapType, db=FALSE){
            PFAMNAME = file.path(path, "pfamNameParser"),
            BLAST = file.path(path, "blastParser"),
            INTERPRO = file.path(path, "interproParser"),
+           PROSITEDE = file.path(path, "prositeDeParser"),
            stop("Invalid baseMapType")
     )
     if( db ){

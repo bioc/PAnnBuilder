@@ -47,7 +47,7 @@ mergeRowByKey(mergeMe, keyCol = 1, sep = ";")
 \arguments{  
   \item{baseMapType}{a character string to indicate which database will be 
     parsed. It can be "sp","trembl","ipi","refseq","equal", "merge","mppi",
-    "PeptideAtlas","DBSubLoc","Pfam", "pfamname" or "blast".}
+    "PeptideAtlas","DBSubLoc","Pfam", "pfamname", "prositede" or "blast".}
   \item{db}{a boolean to indicate whether the parser file for the SQLite-based 
     package will be returned. }    
   \item{outName}{a character string for the output file name of perl program.}

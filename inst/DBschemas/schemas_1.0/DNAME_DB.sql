@@ -24,6 +24,11 @@ CREATE TABLE interpro (
   interpro_name VARCHAR(255) NOT NULL                
   FOREIGN KEY (interpro_id) 
 };
+CREATE TABLE prosite (
+  prosite_id CHAR(9) NOT NULL,                   -- Prosite ID  
+  prosite_de VARCHAR(255) NOT NULL                
+  FOREIGN KEY (prosite_id) 
+};
 CREATE TABLE tax (
   tax_id VARCHAR(10) NOT NULL       -- Tax ID 
   tax_name VARCHAR(255) NOT NULL                
