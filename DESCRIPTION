@@ -5,7 +5,8 @@ Author: Li Hong lihong@sibs.ac.cn
 Maintainer: Li Hong <sysptm@gmail.com> 
 Depends: R (>= 2.7.0), methods, utils, RSQLite,
          Biobase (>= 1.17.0), AnnotationDbi (>= 1.3.12)
-Imports: methods, utils, Biobase, DBI, RSQLite                                     
+Imports: methods, utils, Biobase, DBI, RSQLite                        
+Suggests: org.Hs.ipi.db, org.Hs.sp.db             
 Description: Processing annotation data from public data repositories
         and building protein-centric annoation data packages.
 Keyword: annotation, proteomics
