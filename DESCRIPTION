@@ -1,14 +1,14 @@
 Package: PAnnBuilder
-Version: 1.10.0
+Version: 1.10.1
 Title: Protein annotation data package builder
 Author: Li Hong lihong@sibs.ac.cn 
 Maintainer: Li Hong <sysptm@gmail.com> 
 Depends: R (>= 2.7.0), methods, utils, RSQLite,
          Biobase (>= 1.17.0), AnnotationDbi (>= 1.3.12)
-Imports: methods, utils, Biobase, DBI, RSQLite                        
-Suggests: org.Hs.ipi.db, org.Hs.sp.db             
+Imports: methods, utils, Biobase, DBI, RSQLite, AnnotationDbi
+Suggests: org.Hs.ipi.db
 Description: Processing annotation data from public data repositories
-        and building protein-centric annoation data packages.
+        and building protein-centric annotation data packages.
 Keyword: annotation, proteomics
 biocViews: Annotation, Proteomics
 License: LGPL (>= 2.0)

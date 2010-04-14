@@ -66,8 +66,11 @@ author <- list()
 author[["authors"]] <- "Hong Li"
 author[["maintainer"]] <- "Hong Li <sysptm@gmail.com>"
 
-## It may take a long time to parse database and build R package.
-if(interactive()){
+if(FALSE){
+    # NOTE: THESE PACKAGES ARE NO LONGER AVAILABLE, YOU NEED TO GENERATE
+    #       THEM FOLLOWING THE INSTRUCTIONS IN THE VIGNETTE
+
+    # It may take a long time to parse database and build R package.
     # Build annotation data packages "org.Hs.sp.db" for Homo sapiens
     # proteins in SwissProt.
     pBaseBuilder_DB(baseMapType = "sp", organism = "Homo sapiens",  

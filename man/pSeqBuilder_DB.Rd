@@ -87,7 +87,10 @@ names(blast) <- c("p","e","M","W","G","E","U","F")
 match <- c(0.00001, 0.95, 0.95)
 names(match) <- c("e","c","i")
       
-if(interactive()){
+if(FALSE){
+    ## NOTE: THESE PACKAGES ARE NO LONGER AVAILABLE, YOU NEED TO GENERATE
+    ##       THEM FOLLOWING THE INSTRUCTIONS IN THE VIGNETTE
+
     ## Use packages "org.Hs.sp.db", "org.Hs.ipi.db" to produce annotation R
     ## package for query sequence. Packages "org.Hs.sp.db", "org.Hs.ipi.db"
     ## can be downloaded from http://www.biosino.org/PAnnBuilder/example.jsp. 

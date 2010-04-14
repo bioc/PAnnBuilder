@@ -1,9 +1,13 @@
 import(methods)
-import(utils)
-import(Biobase)
-import(DBI)
-import(RSQLite)
-importFrom("AnnotationDbi", "dbschema")
+importFrom(utils, data, download.file, read.csv, write.table)
+importFrom(Biobase, addVigs2WinMenu, copySubstitute)
+importClassesFrom(DBI, DBIConnection)
+importMethodsFrom(DBI, dbConnect, dbDisconnect, dbDriver,
+                  dbExistsTable, dbGetQuery, dbWriteTable)
+importFrom(RSQLite, sqliteQuickSQL)
+importClassesFrom(AnnotationDbi, AnnDbObj)
+importMethodsFrom(AnnotationDbi, count.mappedkeys, dbconn, dbmeta,
+                  dbschema, revmap)
 
 export(getALLUrl, getALLBuilt, idBlast,
        createAnnObjs, 
@@ -12,6 +16,4 @@ export(getALLUrl, getALLBuilt, idBlast,
        HomoloGeneBuilder_DB, PeptideAtlasBuilder_DB, dNameBuilder_DB, 
        bfBuilder_DB, ptmBuilder_DB, GOABuilder_DB)
       
-exportMethods(
-  "dbschema"
-)       
+exportMethods(dbschema)       
