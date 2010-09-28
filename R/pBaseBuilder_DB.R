@@ -86,6 +86,10 @@ pBaseBuilder_DB <- function(baseMapType = c("sp","trembl","ipi","refseq"), organ
   writeData_DB(type, srcUrls, db, organism)  
   repList <- getRepList_DB(organism, type, srcUrls, built, pkgName)
   writeMeta_DB(db, repList)
-  writeManAnno_DB(pkgName, pkgPath, version, author, repList)  
+  writeManAnno_DB(pkgName, pkgPath, version, author, repList)
+  countFields <- data.frame(c("IPIAC","PFAM","PATH","INTERPRO"),
+                           c("ipi_id","ipi_id","ipi_id","ipi_id"),
+                           c("ipiac","pfam","path","interpro"))
+  buildMapCounts(db,countFields)
   dbDisconnect(db)  
 }

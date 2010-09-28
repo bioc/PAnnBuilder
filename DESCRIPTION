@@ -15,6 +15,7 @@ License: LGPL (>= 2.0)
 URL: http://www.biosino.org/PAnnBuilder
 Collate: initClasses.R
          zzz.R
+	 mapCountsBuilder.R
          GOABuilder_DB.R                  
          HomoloGeneBuilder_DB.R         
          InParanoidBuilder_DB.R         
