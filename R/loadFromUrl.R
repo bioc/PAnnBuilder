@@ -27,7 +27,7 @@ loadFromUrl <- function(srcUrl, destDir = "", verbose=FALSE){
     options(show.error.messages = FALSE)
     if(.Platform$OS.type=="unix"){
       tryMe <- try(download.file(srcUrl, fileName,
-                      method = "internal", quiet = TRUE))
+                      method = "wget", quiet = TRUE))
     }
     if(.Platform$OS.type=="windows"){
       tryMe <- try(download.file(srcUrl, fileName,
