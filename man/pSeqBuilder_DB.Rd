@@ -73,7 +73,7 @@ author[["authors"]] <- "Hong Li"
 author[["maintainer"]] <- "Hong Li <sysptm@gmail.com>"
 
 ## Set query sequences.
-tmp = system.file("data", "query.example", package="PAnnBuilder")
+tmp = system.file("extdata", "query.example", package="PAnnBuilder")
 tmp = readLines(tmp)
 tag = grep("^>",tmp)
 query <- sapply(1:(length(tag)-1), function(x){ 

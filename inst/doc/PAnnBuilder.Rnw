@@ -527,7 +527,7 @@ for annotation query proteins by pSeqBuilder\_DB. Needed R packages \Rpackage{or
 \Rpackage{org.Hs.ipi.db}, can be downloaded via biocLite.
 <<pSeqBuilder, eval=FALSE>>=
 ## Read query sequence.
-tmp = system.file("data", "query.example", package="PAnnBuilder")
+tmp = system.file("extdata", "query.example", package="PAnnBuilder")
 tmp = readLines(tmp)
 tag = grep("^>",tmp)
 query <- sapply(1:(length(tag)-1), function(x){ 
