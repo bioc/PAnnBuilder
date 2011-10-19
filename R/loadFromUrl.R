@@ -91,7 +91,7 @@ unzipFile <- function(fileName, where =
                            " http://www.stats.ox.ac.uk/pub/Rtools/"))
               }
         }else{
-            zip.unpack(fileName, getwd())
+            unzip(fileName)
         }
         unlink(fileName)
     }
