@@ -66,7 +66,7 @@ validateUrl <- function(srcUrl){
 }
 
 unzipFile <- function(fileName, where =
-                      file.path(.path.package("PAnnBuilder"), "data"),
+                      file.path(path.package("PAnnBuilder"), "data"),
                       isgz = FALSE){
     curDir <- getwd()
     setwd(where)

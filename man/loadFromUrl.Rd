@@ -10,7 +10,7 @@
 \usage{
 loadFromUrl(srcUrl, destDir = "", verbose=FALSE)
 validateUrl(srcUrl)
-unzipFile(fileName, where = file.path(.path.package("PAnnBuilder"),
+unzipFile(fileName, where = file.path(path.package("PAnnBuilder"),
 "data"), isgz = FALSE)
 }
 

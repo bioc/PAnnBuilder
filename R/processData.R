@@ -28,7 +28,7 @@ getBaseParsers <- function(baseMapType, db=FALSE){
   ##     
      
     # Default directory of parsers
-    path <- file.path(.path.package("PAnnBuilder"), "scripts")
+    path <- file.path(path.package("PAnnBuilder"), "scripts")
     parser <- switch(toupper(baseMapType),
            SP = file.path(path, "spParser"),
            TREMBL = file.path(path, "spParser"),

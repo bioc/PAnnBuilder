@@ -5,7 +5,7 @@ writeManAnno <- function (pkgName, pkgPath, version, author, repList, pattern)
 {
     writeDescription(pkgName, pkgPath, version, author)
     copyTemplates(repList, pattern, pkgName, pkgPath)
-    copySubstitute(file.path(.path.package("PAnnBuilder"), "templates", 
+    copySubstitute(file.path(path.package("PAnnBuilder"), "templates", 
         "Anno.Rd"), file.path(pkgPath, pkgName, "man", paste(pkgName, 
         ".Rd", sep = "")), repList, "#")    
 }  
@@ -21,7 +21,7 @@ writeManAnno_DB <- function (pkgName, pkgPath, version, author, repList)
 writeManSQ <- function (pkgName, pkgPath, version, author, repList) 
 {
   writeDescription(pkgName, pkgPath, version, author)
-  copySubstitute(file.path(.path.package("PAnnBuilder"), "templates", 
+  copySubstitute(file.path(path.package("PAnnBuilder"), "templates", 
         "PKGNAMESQ.Rd"), file.path(pkgPath, pkgName, "man", paste(pkgName, 
         ".Rd", sep = "")), repList, "#")
         
@@ -31,7 +31,7 @@ writeManMerge <- function (pkgName, pkgPath, version, author, repList, pattern)
 {
     writeDescription(pkgName, pkgPath, version, author)
     copyTemplates(repList, pattern, pkgName, pkgPath)
-    copySubstitute(file.path(.path.package("PAnnBuilder"), "templates", 
+    copySubstitute(file.path(path.package("PAnnBuilder"), "templates", 
         "Merge.Rd"), file.path(pkgPath, pkgName, "man", paste(pkgName, 
         ".Rd", sep = "")), repList, "#") 
 }  
@@ -500,19 +500,19 @@ copyTemplates <- function (repList, pattern, pkgName, pkgPath, replaceBy = NULL)
         options(show.error.messages = FALSE)
         ## copy template file to the rdName, and the place labed with "#" be 
         ## substituted with value in repList 
-        copied <- try(copySubstitute(file.path(.path.package("PAnnBuilder"), 
+        copied <- try(copySubstitute(file.path(path.package("PAnnBuilder"), 
             "templates", i), rdName, repList, "#"))
 
         options(show.error.messages = TRUE)
         if (inherits(copied, "try-error")) {
-            warning(paste("Can't copy", file.path(.path.package("PAnnBuilder"), 
+            warning(paste("Can't copy", file.path(path.package("PAnnBuilder"), 
                 "templates", i)))
         }
     }
 }
 
 copyTemplates_DB <- function (repList, pkgName, pkgPath) {
-    tmpdir = file.path(.path.package("PAnnBuilder"), 
+    tmpdir = file.path(path.package("PAnnBuilder"), 
             "templates", sub("_DB\\.sql","\\.DB",repList[["DBSCHEMA"]]) )
     templates <- dir(path=tmpdir,pattern=".Rd$")   
     prefix <- sub("\\.db","",pkgName)
