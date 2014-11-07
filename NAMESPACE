@@ -4,7 +4,7 @@ importFrom(Biobase, addVigs2WinMenu, copySubstitute)
 importClassesFrom(DBI, DBIConnection)
 importMethodsFrom(DBI, dbConnect, dbDisconnect, dbDriver,
                   dbExistsTable, dbGetQuery, dbWriteTable)
-importFrom(RSQLite, sqliteQuickSQL)
+importFrom(RSQLite, dbSendQuery)
 importClassesFrom(AnnotationDbi, AnnDbObj)
 importMethodsFrom(AnnotationDbi, count.mappedkeys, dbconn, dbmeta,
                   dbschema, revmap)
