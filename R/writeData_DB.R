@@ -14,13 +14,13 @@ createEmptyDPkg <- function(pkgName, pkgPath,
 }
 
 writeMeta_DB <- function(db, repList){
-  sqliteQuickSQL(db, 
+  dbSendQuery(db, 
    "CREATE TABLE metadata (name VARCHAR(80) PRIMARY KEY, value VARCHAR(255) );")
   for ( i in names(repList) ) {
     if( repList[[i]]!="" ){
       metadata_sql <- paste("INSERT INTO metadata VALUES ('", i, "', '",
 				    repList[i], "');", sep="", collapse="")
-      sqliteQuickSQL(db, metadata_sql)
+      dbSendQuery(db, metadata_sql)
     }
   }
 }
